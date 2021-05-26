@@ -9,18 +9,15 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>dk.test.kafka</groupId>
-    <artifactId>fakturadb</artifactId>
+    <artifactId>kafkatester</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>KafkaTester</name>
-    <description>Demonstration af Statens Faktura Database</description>
+    <description>Demonstration Kafka kapabilliteter</description>
     <properties>
         <java.version>11</java.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <hawt-io.version>2.4.0</hawt-io.version>
-        <spring-boot.build-image.imageName>ufst/${project.artifactId}:${project.version}</spring-boot.build-image.imageName>
-        <jkube.generator.name>${spring-boot.build-image.imageName}</jkube.generator.name>
-        <jkube.generator.name>kind-registry:5000/fakturadb:${project.version}</jkube.generator.name>
-        <jkube.skip.tag>true</jkube.skip.tag>
+        <jkube.generator.name>kind-registry:5000/${project.artifactId}</jkube.generator.name>
         <jkube.createExternalUrls>true</jkube.createExternalUrls>
         <jkube.domain>localhost</jkube.domain>
     </properties>
