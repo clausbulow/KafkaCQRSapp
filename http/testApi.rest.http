@@ -1,3 +1,67 @@
-POST http://localhost:8080//sayhi
+POST http://localhost:8080/sayhi
 
-Here is what migth happen
+Here is what might happen
+
+###
+POST http://localhost:8081/sayhiwithheaders
+Content-Type: application/json
+transactionId: transId5555
+
+ {
+    "cpr": "021165-1403",
+    "fornavn": "Georg",
+    "efternavn": "Hansen"
+  }
+
+
+###
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1409",
+  "fornavn": "Hans",
+  "efternavn": "Henriksen"
+}
+
+###
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1411",
+  "fornavn": "Jørgen",
+  "efternavn": "Jensen-Hansel"
+}
+
+###
+PUT http://localhost:8081/commands/klient/021165-1411
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1411",
+  "fornavn": "Jørgen",
+  "efternavn": "Jensen-Hansen"
+}
+
+
+###
+PUT http://localhost:8081/commands/klient/021165-1409
+Content-Type: application/json
+requestId: transId2
+
+{
+  "fornavn": "Hans-Fredrik",
+  "efternavn": "Jensen-Jensen"
+}
+
+###
+
+GET http://localhost:8081/queries/klienter
+Content-Type: application/json
+requestId: transId2
+
+

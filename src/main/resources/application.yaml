@@ -1,5 +1,25 @@
+server:
+  port: 8081
 spring:
+  application:
+    name: kafkatestapplication
+
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      bootstrap-servers: plaintext://localhost:9092
+      bootstrap-servers: PLAIN-9092://localhost:9092
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  datasource:
+    initialization-mode: always
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/data_engineer?currentSchema=inventory
+    username: data_engineer
+    password: password
+

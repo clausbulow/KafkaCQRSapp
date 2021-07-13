@@ -1,9 +1,8 @@
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: platform.confluent.io/v1beta1
 kind: KafkaTopic
 metadata:
   name: topic1
-  labels:
-    strimzi.io/cluster: "my-cluster"
+  namespace: confluent
 spec:
-  partitions: 3
-  replicas: 1
+  replicas: 2
+  partitionCount: 5

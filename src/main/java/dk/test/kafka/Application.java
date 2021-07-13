@@ -11,8 +11,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootApplication
 @Slf4j
@@ -31,10 +39,11 @@ public class Application {
     @Component
     static class Listener{
         @KafkaListener (id = "group1", topics = "topic1")
-        public void listenToTopic1(ConsumerRecord<String,String> cr, @Payload String input){
+        public void listenToTopic1(@Payload String input, @Headers MessageHeaders messageHeaders, Acknowledgment ack){
             System.out.println("I'm hit: "+input);
-            System.out.println("Here are my header values:");
-            cr.headers().forEach(header -> System.out.println(header.key()+":"+header.value()));
+            byte[] transactionId = (byte[])messageHeaders.get("transactionId");
+            System.out.println("Here is my transactionId: "+new String(transactionId));
+            ack.acknowledge();
         }
     }
 }
