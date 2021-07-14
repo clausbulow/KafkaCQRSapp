@@ -63,7 +63,8 @@ public class EventService {
         ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("dk.test.kafka.klient.model.events");
+        //TODO more refined component-scanning here!
+        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("dk.test.klient.model.events");
         for (BeanDefinition definition: candidateComponents){
             System.out.println(definition.getBeanClassName());
             Class clazz = Class.forName(definition.getBeanClassName());

@@ -1,7 +1,6 @@
-package dk.test.kafka.klient.controller;
+package dk.test.klient.controller;
 
-import dk.test.kafka.events.model.BusinessEvent;
-import dk.test.kafka.klient.service.KafkaQueryService;
+import dk.test.klient.service.KlientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.util.List;
 public class KlientQueryController {
 
     @Autowired
-    KafkaQueryService service;
+    KlientService service;
 
 
     @GetMapping("/klienter")
@@ -25,11 +24,6 @@ public class KlientQueryController {
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
 
-    @GetMapping("/eventstore")
-    public ResponseEntity<List<BusinessEvent<?>>> eventSTroe(@RequestHeader("requestId") String requestId) throws Exception {
-        log.debug("query all-clients called");
-        return ResponseEntity.accepted().body(service.getEventStoreItems());
-    }
     @GetMapping("/klienter/{cpr}")
     public ResponseEntity<?> processKlientOpretRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
         return null;

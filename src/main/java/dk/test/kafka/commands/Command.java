@@ -5,5 +5,6 @@ import lombok.Value;
 
 @Data
 public class Command {
+    public String aggregateId;
     public String requestId;
 }

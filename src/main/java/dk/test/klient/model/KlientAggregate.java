@@ -1,16 +1,16 @@
 //inspired by https://blog.nebrass.fr/playing-with-cqrs-and-event-sourcing-in-spring-boot-and-axon/
-package dk.test.kafka.klient.model;
+package dk.test.klient.model;
 
 import dk.test.kafka.events.model.AggregateTypes;
 import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.kafka.events.annotations.CommandHandler;
 import dk.test.kafka.events.annotations.EventHandler;
 import dk.test.kafka.events.service.EventService;
-import dk.test.kafka.klient.model.commands.OpretKlientCommand;
-import dk.test.kafka.klient.model.commands.RetKlientCommand;
-import dk.test.kafka.klient.model.events.KlientOprettetObject;
-import dk.test.kafka.klient.model.events.KlientRettetObject;
-import dk.test.kafka.klient.service.KlientService;
+import dk.test.klient.model.commands.OpretKlientCommand;
+import dk.test.klient.model.commands.RetKlientCommand;
+import dk.test.klient.model.events.KlientOprettetObject;
+import dk.test.klient.model.events.KlientRettetObject;
+import dk.test.klient.service.KlientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

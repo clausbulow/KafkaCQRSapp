@@ -1,12 +1,14 @@
-package dk.test.kafka.klient.service;
+package dk.test.klient.service;
 
-import dk.test.kafka.klient.model.events.KlientOprettetObject;
-import dk.test.kafka.klient.model.events.KlientRettetObject;
-import dk.test.kafka.klient.model.repos.KlientItem;
-import dk.test.kafka.klient.model.repos.KlientJpaRepository;
+import dk.test.klient.controller.KlientDTO;
+import dk.test.klient.model.events.KlientOprettetObject;
+import dk.test.klient.model.events.KlientRettetObject;
+import dk.test.klient.model.repos.KlientItem;
+import dk.test.klient.model.repos.KlientJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,8 +32,10 @@ public class KlientService {
         repository.save(klientItem);
     }
 
-    public List <KlientItem> getAllKlienter(){
-        return repository.findAll();
+    public List <KlientDTO> getAllKlienter(){
+        List<KlientDTO> result = new ArrayList<>();
+        repository.findAll().stream().forEach( klientItem -> result.add(KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getFornavn()).build()));
+        return result;
     }
 
 }

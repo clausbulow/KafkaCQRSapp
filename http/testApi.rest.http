@@ -55,19 +55,12 @@ requestId: transId2
 
 {
   "fornavn": "Hans-Fredrik",
-  "efternavn": "Jensen-Jensen"
+  "efternavn": "Jensens Jensens Bondegård"
 }
 
 ###
 
 GET http://localhost:8081/queries/klienter
-Content-Type: application/json
-requestId: transId2
-
-
-###
-
-GET http://localhost:8081/queries/eventstore
 Content-Type: application/json
 requestId: transId2
 

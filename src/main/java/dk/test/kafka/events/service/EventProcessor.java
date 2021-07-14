@@ -1,29 +1,18 @@
-package dk.test.kafka.klient;
+package dk.test.kafka.events.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import dk.test.kafka.events.model.AggregateTypes;
 import dk.test.kafka.events.model.BusinessEvent;
-import dk.test.kafka.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.streams.processor.Processor;
-import org.apache.kafka.streams.processor.ProcessorContext;
-import org.apache.kafka.streams.processor.StateStore;
-import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
-@Component
+@Service
 @Slf4j
-public class EventProcessor implements Processor<String, JsonNode> {
+public class EventProcessor  {
     @Autowired
     EventService eventService;
     @Autowired
@@ -32,16 +21,8 @@ public class EventProcessor implements Processor<String, JsonNode> {
     @Autowired
     ApplicationEventPublisher publisher;
 
-    KeyValueStore<String, JsonNode> store;
 
-    @Override
-    public void init(ProcessorContext processorContext) {
-        store = (KeyValueStore<String, JsonNode>) processorContext. getStateStore("klienter");
-
-    }
-
-    @Override
-    public void process(String s, JsonNode json) {
+    public void process(JsonNode json) {
         String eventNavn = json.get("eventNavn").asText();
         String requestId =  json.get("requestId").asText();
         String key = json.get("key").asText();
@@ -60,18 +41,11 @@ public class EventProcessor implements Processor<String, JsonNode> {
                                 actor(actor).
                                 object(eventObj).
                                 build();
-                store.put(key,event);
-                //store.flush();
                 publisher.publishEvent(businessEvent);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             };
 
         };
-    }
-
-    @Override
-    public void close() {
-
     }
 }

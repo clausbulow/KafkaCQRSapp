@@ -1,5 +1,7 @@
-package dk.test.kafka.klient.model.repos;
+package dk.test.klient.model.repos;
 
+import dk.test.kafka.events.annotations.Aggregate;
+import dk.test.kafka.events.annotations.AggregateIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,9 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="klienter")
-
+@Aggregate
 public class KlientItem {
+    @AggregateIdentifier
     @Id
     String cpr;
     String fornavn;

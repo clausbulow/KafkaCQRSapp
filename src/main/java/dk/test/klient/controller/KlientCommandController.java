@@ -1,9 +1,9 @@
-package dk.test.kafka.klient.controller;
+package dk.test.klient.controller;
 
 import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.kafka.commands.CommandDispatcher;
-import dk.test.kafka.klient.model.commands.OpretKlientCommand;
-import dk.test.kafka.klient.model.commands.RetKlientCommand;
+import dk.test.klient.model.commands.OpretKlientCommand;
+import dk.test.klient.model.commands.RetKlientCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
