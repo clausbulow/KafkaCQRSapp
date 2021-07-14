@@ -2,8 +2,8 @@ package dk.test.kafka.klient.service;
 
 import dk.test.kafka.klient.model.events.KlientOprettetObject;
 import dk.test.kafka.klient.model.events.KlientRettetObject;
-import dk.test.kafka.klient.model.persistance.KlientItem;
-import dk.test.kafka.klient.model.persistance.KlientJpaRepository;
+import dk.test.kafka.klient.model.repos.KlientItem;
+import dk.test.kafka.klient.model.repos.KlientJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

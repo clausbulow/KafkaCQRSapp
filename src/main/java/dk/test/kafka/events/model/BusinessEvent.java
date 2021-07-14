@@ -6,6 +6,9 @@ import lombok.Data;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
 
+import java.sql.Date;
+import java.time.Instant;
+
 @Builder
 @Data
 public  class BusinessEvent<T>  implements ResolvableTypeProvider {
@@ -13,6 +16,8 @@ public  class BusinessEvent<T>  implements ResolvableTypeProvider {
     private String requestId;
     private String key;
     private String actor;
+    private long version;
+    private  Instant created_at;
     private AggregateTypes aggregateType;
     T object;
 

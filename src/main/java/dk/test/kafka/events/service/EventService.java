@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.sql.Date;
 import java.time.Instant;
 import java.util.*;
 
@@ -35,6 +36,8 @@ public class EventService {
     @Transactional
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
         AggregateItem klientAggregateItem = aggregateRepository.findByType(businessEvent.getAggregateType().name());
+        businessEvent.setVersion(klientAggregateItem.getVersion());
+        businessEvent.setCreated_at(Instant.now());
         EventStoreItem eventStoreItem = new EventStoreItem();
         eventStoreItem.setActor(businessEvent.getActor());
         eventStoreItem.setAggregateid(klientAggregateItem.getAggregateid());
@@ -49,7 +52,7 @@ public class EventService {
         eventStoreItem.setKey(businessEvent.getKey());
         eventStoreItem.setVersion(klientAggregateItem.getVersion());
         eventStoreItem.setRequestId(businessEvent.getRequestId());
-        eventStoreItem.setCreated_at(Date.from(Instant.now()));
+        eventStoreItem.setCreated_at(new Date(businessEvent.getCreated_at().toEpochMilli()));
         eventStoreRepository.saveAndFlush(eventStoreItem);
         klientAggregateItem.setVersion(klientAggregateItem.getVersion()+1);
         aggregateRepository.save(klientAggregateItem);

@@ -30,10 +30,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
-    public NewTopic topic() {
-        return new NewTopic("topic1", 1, (short) 1);
-    }
 
 
     @Component

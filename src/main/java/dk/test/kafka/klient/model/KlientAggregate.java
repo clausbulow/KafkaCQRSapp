@@ -42,11 +42,6 @@ public class KlientAggregate  {
         klientService.opretKlient(klient);
         System.out.println("Klient oprettet");
     }
-    @EventHandler
-    public void onGenereel(BusinessEvent<?> event) throws Exception{
-
-        System.out.println("Klient oprettet");
-    }
 
 
     @CommandHandler

@@ -1,18 +1,13 @@
 package dk.test.kafka.klient.controller;
 
-import dk.test.kafka.commands.CommandDispatcher;
 import dk.test.kafka.events.model.BusinessEvent;
-import dk.test.kafka.klient.model.commands.OpretKlientCommand;
-import dk.test.kafka.klient.model.commands.RetKlientCommand;
-import dk.test.kafka.klient.service.KlientKafkaQueryService;
+import dk.test.kafka.klient.service.KafkaQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/queries")
@@ -21,7 +16,8 @@ import java.util.Map;
 public class KlientQueryController {
 
     @Autowired
-    KlientKafkaQueryService service;
+    KafkaQueryService service;
+
 
     @GetMapping("/klienter")
     public ResponseEntity<List<KlientDTO>> allKlienter(@RequestHeader("requestId") String requestId) throws Exception {
@@ -29,6 +25,11 @@ public class KlientQueryController {
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
 
+    @GetMapping("/eventstore")
+    public ResponseEntity<List<BusinessEvent<?>>> eventSTroe(@RequestHeader("requestId") String requestId) throws Exception {
+        log.debug("query all-clients called");
+        return ResponseEntity.accepted().body(service.getEventStoreItems());
+    }
     @GetMapping("/klienter/{cpr}")
     public ResponseEntity<?> processKlientOpretRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
         return null;

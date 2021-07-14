@@ -4,20 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dk.test.kafka.events.service.EventService;
 import dk.test.kafka.klient.EventProcessor;
 import dk.test.kafka.klient.service.EventTransformer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.Topology;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.Named;
+import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.kstream.*;
+import org.apache.kafka.streams.processor.StateStore;
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
@@ -43,7 +40,7 @@ import java.util.Properties;
 @Configuration
 @EnableKafka
 @EnableKafkaStreams
-
+@Slf4j
 public class ApplicationConfig {
     @Autowired
     KafkaProperties kafkaProperties;
@@ -135,10 +132,20 @@ public class ApplicationConfig {
 //        streamsBuilder.addStateStore(perspectiveStoreStoreBuilder);
 
         KeyValueBytesStoreSupplier klienter_table_supplier = Stores.persistentKeyValueStore("klienter_table");
-        StoreBuilder<KeyValueStore<String, Object>> klientTableStoreBuilder = Stores.keyValueStoreBuilder(klienter_table_supplier, Serdes.String(), new JsonSerde<>());
+        StoreBuilder<KeyValueStore<String, JsonNode>> klientTableStoreBuilder = Stores.keyValueStoreBuilder(klienter_table_supplier, Serdes.String(), new JsonSerde<>());
+
+
 
         KStream<String, JsonNode> inputStream = streamsBuilder.stream("event.dataengineer.inventory.eventstore");
-        inputStream.transformValues(() -> transformer).toTable(Named.as("klienter"),Materialized.as(klienter_table_supplier));
+        inputStream.selectKey((key, value) ->{
+            Long newkey = value.get("version").asLong();
+            log.info("Repartioning from key "+key+" to "+newkey);
+        return newkey;
+        }).toTable(Named.as("eventstore"),Materialized.<Long, JsonNode,  KeyValueStore<Bytes, byte[]>>as("eventstore").withKeySerde(Serdes.Long()));
+
+        inputStream.transformValues(() -> transformer).
+                toTable(Named.as("klienter"),Materialized.as(klienter_table_supplier));
+
         return streamsBuilder.build();
     }
 

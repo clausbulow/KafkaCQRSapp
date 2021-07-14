@@ -1,4 +1,4 @@
-package dk.test.kafka.klient.model.persistance;
+package dk.test.kafka.klient.model.repos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
