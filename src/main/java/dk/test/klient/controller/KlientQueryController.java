@@ -26,7 +26,7 @@ public class KlientQueryController {
     }
 
     @GetMapping("/klienter/{cpr}")
-    public ResponseEntity<?> processKlientOpretRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<?> processKlientGetKlientRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
         ResponseEntity<?> result;
         final Optional<KlientDTO> klient = service.getKlient(cpr);
         if (klient.isPresent()){
@@ -37,7 +37,7 @@ public class KlientQueryController {
     }
 
     @GetMapping("/klienter/eventstore")
-    public ResponseEntity<?> processEventstoreRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<?> processGetEventstoreRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
         return ResponseEntity.accepted().body(service.getEventStore());
     }
 

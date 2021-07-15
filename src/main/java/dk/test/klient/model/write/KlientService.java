@@ -3,17 +3,16 @@ package dk.test.klient.model.write;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.kafka.events.model.EventStoreItem;
 import dk.test.kafka.events.model.EventStoreRepository;
 import dk.test.kafka.events.service.EventProcessor;
-import dk.test.kafka.events.service.EventService;
 import dk.test.klient.controller.KlientDTO;
+import dk.test.klient.model.KlientItem;
 import dk.test.klient.model.events.KlientOprettetObject;
 import dk.test.klient.model.events.KlientRettetObject;
-import dk.test.klient.model.KlientItem;
-import dk.test.klient.model.read.KlientJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -34,9 +33,6 @@ public class KlientService {
 
     @Autowired
     EventProcessor processor;
-
-
-
 
     public void retKlient(KlientRettetObject klient) throws Exception{
         KlientItem klientItem = repository.findById(klient.getCpr()).orElse(new KlientItem());
@@ -84,8 +80,8 @@ public class KlientService {
     }
 
 
-    @PostConstruct
-    public void initRepo(){
+    @EventListener
+    public void initRepo(ContextRefreshedEvent event){
         List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
         eventStoreItems.stream().forEach(item -> {
             try {
