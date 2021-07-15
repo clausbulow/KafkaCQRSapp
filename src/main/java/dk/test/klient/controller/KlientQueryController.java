@@ -20,13 +20,13 @@ public class KlientQueryController {
 
 
     @GetMapping("/klienter")
-    public ResponseEntity<List<KlientDTO>> allKlienter(@RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<List<KlientDTO>> allKlienter(@RequestHeader("requestId") String requestId)  {
         log.debug("query all-clients called");
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
 
     @GetMapping("/klienter/{cpr}")
-    public ResponseEntity<?> processKlientGetKlientRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<?> processKlientGetKlientRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId){
         ResponseEntity<?> result;
         final Optional<KlientDTO> klient = service.getKlient(cpr);
         if (klient.isPresent()){
@@ -37,7 +37,7 @@ public class KlientQueryController {
     }
 
     @GetMapping("/klienter/eventstore")
-    public ResponseEntity<?> processGetEventstoreRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<?> processGetEventstoreRequest(@RequestHeader("requestId") String requestId) {
         return ResponseEntity.accepted().body(service.getEventStore());
     }
 

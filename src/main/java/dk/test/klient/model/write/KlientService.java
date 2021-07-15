@@ -51,14 +51,14 @@ public class KlientService {
     }
 
     public List <KlientDTO> getAllKlienter(){
-        List<KlientDTO> result = new ArrayList<>();
-        repository.findAll().stream().forEach( klientItem -> result.add(KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getFornavn()).build()));
+        final List<KlientDTO> result = new ArrayList<>();
+        repository.findAll().stream().forEach( klientItem -> result.add(KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build()));
         return result;
     }
 
     public List<JsonNode> getEventStore(){
-        List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
-        ArrayList<JsonNode> result = new ArrayList<>();
+        final List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
+        final ArrayList<JsonNode> result = new ArrayList<>();
         eventStoreItems.stream().forEach(item -> {
             try {
                 result.add(mapper.readTree(item.getData()));
@@ -70,7 +70,7 @@ public class KlientService {
     }
 
     public Optional<KlientDTO> getKlient(String cpr) {
-        Optional<KlientItem> optionalKlientItem = repository.findById(cpr);
+        final Optional<KlientItem> optionalKlientItem = repository.findById(cpr);
         KlientDTO klient = null;
         if (optionalKlientItem.isPresent()){
             KlientItem klientItem = optionalKlientItem.get();
@@ -82,7 +82,7 @@ public class KlientService {
 
     @EventListener
     public void initRepo(ContextRefreshedEvent event){
-        List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
+        final List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
         eventStoreItems.stream().forEach(item -> {
             try {
                 processor.process(mapper.readTree(item.getData()));
