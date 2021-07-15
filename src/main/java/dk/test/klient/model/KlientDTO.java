@@ -1,4 +1,4 @@
-package dk.test.klient.controller;
+package dk.test.klient.model;
 
 import lombok.Builder;
 import lombok.Data;

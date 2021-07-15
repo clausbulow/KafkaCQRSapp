@@ -1,4 +1,4 @@
-package dk.test.klient.model.events;
+package dk.test.klient.model.eventsobject;
 
 import dk.test.kafka.events.annotations.BusinessObject;
 import lombok.Builder;

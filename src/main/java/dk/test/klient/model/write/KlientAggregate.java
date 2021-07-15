@@ -8,8 +8,8 @@ import dk.test.kafka.events.annotations.EventHandler;
 import dk.test.kafka.events.service.EventService;
 import dk.test.klient.model.commands.OpretKlientCommand;
 import dk.test.klient.model.commands.RetKlientCommand;
-import dk.test.klient.model.events.KlientOprettetObject;
-import dk.test.klient.model.events.KlientRettetObject;
+import dk.test.klient.model.eventsobject.KlientOprettetObject;
+import dk.test.klient.model.eventsobject.KlientRettetObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,21 +24,21 @@ public class KlientAggregate  {
     EventService eventService;
 
     @Autowired
-    KlientService klientService;
+    KlientWriteModelService klientWriteModelService;
 
 
 
     @EventHandler
     public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
         KlientRettetObject klient = event.getObject();
-        klientService.retKlient(klient);
+        klientWriteModelService.retKlient(klient);
         System.out.println("Klient rettet");
     }
 
     @EventHandler
     public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception{
         KlientOprettetObject klient = event.getObject();
-        klientService.opretKlient(klient);
+        klientWriteModelService.opretKlient(klient);
         System.out.println("Klient oprettet");
     }
 

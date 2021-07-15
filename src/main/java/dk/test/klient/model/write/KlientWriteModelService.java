@@ -6,24 +6,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.test.kafka.events.model.EventStoreItem;
 import dk.test.kafka.events.model.EventStoreRepository;
 import dk.test.kafka.events.service.EventProcessor;
-import dk.test.klient.controller.KlientDTO;
+import dk.test.klient.model.KlientDTO;
 import dk.test.klient.model.KlientItem;
-import dk.test.klient.model.events.KlientOprettetObject;
-import dk.test.klient.model.events.KlientRettetObject;
+import dk.test.klient.model.eventsobject.KlientOprettetObject;
+import dk.test.klient.model.eventsobject.KlientRettetObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class KlientService {
+public class KlientWriteModelService {
     @Autowired
-    KlientEventRepository repository;
+    KlientWriteModelRepository repository;
 
     @Autowired
     EventStoreRepository eventStore;

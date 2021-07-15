@@ -1,6 +1,6 @@
-package dk.test.klient.controller;
+package dk.test.klient.model.write;
 
-import dk.test.klient.model.write.KlientService;
+import dk.test.klient.model.KlientDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/queries")
+@RequestMapping("/writemodel")
 
 @Slf4j
-public class KlientQueryController {
+public class KlientWriteModelController {
 
     @Autowired
-    KlientService service;
+    KlientWriteModelService service;
 
 
     @GetMapping("/klienter")

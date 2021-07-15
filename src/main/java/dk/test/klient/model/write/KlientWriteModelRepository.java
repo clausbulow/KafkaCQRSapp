@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class KlientEventRepository {
+public class KlientWriteModelRepository {
     private Map<String, KlientItem> klienter = new HashMap<>();
 
     public Optional<KlientItem> findById(String id){
