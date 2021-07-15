@@ -1,4 +1,4 @@
-package dk.test.klient.model;
+package dk.test.klient.model.write;
 
 import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.kafka.events.service.EventService;

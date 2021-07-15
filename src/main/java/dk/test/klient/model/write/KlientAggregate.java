@@ -1,5 +1,5 @@
 //inspired by https://blog.nebrass.fr/playing-with-cqrs-and-event-sourcing-in-spring-boot-and-axon/
-package dk.test.klient.model;
+package dk.test.klient.model.write;
 
 import dk.test.kafka.events.model.AggregateTypes;
 import dk.test.kafka.events.model.BusinessEvent;
@@ -10,7 +10,6 @@ import dk.test.klient.model.commands.OpretKlientCommand;
 import dk.test.klient.model.commands.RetKlientCommand;
 import dk.test.klient.model.events.KlientOprettetObject;
 import dk.test.klient.model.events.KlientRettetObject;
-import dk.test.klient.service.KlientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package dk.test.klient.model.repos;
+package dk.test.klient.model;
 
 import dk.test.kafka.events.annotations.Aggregate;
 import dk.test.kafka.events.annotations.AggregateIdentifier;
