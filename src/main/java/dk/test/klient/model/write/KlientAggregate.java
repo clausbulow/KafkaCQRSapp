@@ -31,15 +31,15 @@ public class KlientAggregate  {
     @EventHandler
     public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
         KlientRettetObject klient = event.getObject();
-        klientWriteModelService.retKlient(klient);
-        System.out.println("Klient rettet");
+        klientWriteModelService.retKlient(klient, event.getVersion());
+        System.out.println("Klient rettet i writemodel");
     }
 
     @EventHandler
     public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception{
         KlientOprettetObject klient = event.getObject();
-        klientWriteModelService.opretKlient(klient);
-        System.out.println("Klient oprettet");
+        klientWriteModelService.opretKlient(klient, event.getVersion());
+        System.out.println("Klient oprettet i writemodel");
     }
 
 

@@ -10,6 +10,8 @@ import dk.test.klient.model.KlientDTO;
 import dk.test.klient.model.KlientItem;
 import dk.test.klient.model.eventsobject.KlientOprettetObject;
 import dk.test.klient.model.eventsobject.KlientRettetObject;
+import dk.test.klient.model.exceptions.InvalidEventVersionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -18,9 +20,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
+@Slf4j
 public class KlientWriteModelService {
+    private AtomicLong currentEventVersion = new AtomicLong(Long.valueOf(-1));
     @Autowired
     KlientWriteModelRepository repository;
 
@@ -33,15 +38,19 @@ public class KlientWriteModelService {
     @Autowired
     EventProcessor processor;
 
-    public void retKlient(KlientRettetObject klient) throws Exception{
+    public void retKlient(KlientRettetObject klient, long version) throws Exception{
         KlientItem klientItem = repository.findById(klient.getCpr()).orElse(new KlientItem());
+        if (!currentEventVersion.compareAndSet(version-1,version)) {
+            log.error("Invalid version when writing to klient write model.");
+            //throw new InvalidEventVersionException("Invalid version when reading klient write model");
+        }
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
         repository.save(klientItem);
     }
 
-    public void opretKlient(KlientOprettetObject klient) throws Exception{
+    public void opretKlient(KlientOprettetObject klient, long version) throws Exception{
         KlientItem klientItem = new KlientItem();
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());

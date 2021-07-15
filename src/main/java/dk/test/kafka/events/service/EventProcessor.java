@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class EventProcessor  {
@@ -27,6 +29,11 @@ public class EventProcessor  {
         String requestId =  json.get("requestId").asText();
         String key = json.get("key").asText();
         String actor = json.get("actor").asText();
+        long version = 0;
+        final Optional<JsonNode> optionalVersion = Optional.ofNullable(json.get("version"));
+        if (optionalVersion.isPresent()){
+            version = optionalVersion.get().asLong();
+        }
        // AggregateTypes aggregateType = AggregateTypes.valueOf(json.get("actor").asText());
         if (eventNavn != null) {
             Class<?> eventClass = eventService.getEventClass(eventNavn);
@@ -39,6 +46,7 @@ public class EventProcessor  {
                                 requestId(requestId).
                                 key(key).
                                 actor(actor).
+                                version(version).
                                 object(eventObj).
                                 build();
                 publisher.publishEvent(businessEvent);

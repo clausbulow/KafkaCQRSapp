@@ -22,5 +22,4 @@ public class KlientItem {
     String cpr;
     String fornavn;
     String efternavn;
-
 }
