@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface EventStoreRepository extends JpaRepository<EventStoreItem, Long> {
-    @Query("select e from EventStoreItem e, AggregateItem a where a.aggregateid = e.aggregateid and a.type = ?1 order by e.sequencenumber")
-    List<EventStoreItem> getEventStoryByAggregate(String aggregateName);
+    @Query("select e from EventStoreItem e where e.businesskey= ?1 order by e.version")
+    List<EventStoreItem> getEventStoreItemByAggregateId(String businesskey);
 }

@@ -15,17 +15,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class EventStoreItem {
     @Id
+    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
+    UUID id;
+
     @SequenceGenerator(name="eventstore_sequencenumber_seq",
             sequenceName="eventstore_sequencenumber_seq",
             allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "eventstore_sequencenumber_seq")
     Long sequencenumber;
 
-    @Column(name="aggregateid", updatable = false, nullable = false)
-    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
-    UUID aggregateid;
-
-    String key;
+    String businesskey;
 
     String actor;
     @Column(name = "requestid")

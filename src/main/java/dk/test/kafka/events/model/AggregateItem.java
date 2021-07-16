@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,7 +18,8 @@ import java.util.UUID;
 public class AggregateItem {
     @Id
     @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
-    UUID aggregateid;
-    String type;
+    UUID id;
     long version;
+    String businesskey;
+    String type;
 }

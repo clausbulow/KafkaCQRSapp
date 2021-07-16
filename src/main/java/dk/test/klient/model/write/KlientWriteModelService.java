@@ -3,6 +3,8 @@ package dk.test.klient.model.write;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.test.kafka.events.model.AggregateItem;
+import dk.test.kafka.events.model.AggregateRepository;
 import dk.test.kafka.events.model.EventStoreItem;
 import dk.test.kafka.events.model.EventStoreRepository;
 import dk.test.kafka.events.service.EventProcessor;
@@ -30,7 +32,10 @@ public class KlientWriteModelService {
     KlientWriteModelRepository repository;
 
     @Autowired
-    EventStoreRepository eventStore;
+    EventStoreRepository eventStoreRepository;
+
+    @Autowired
+    AggregateRepository aggregateRepository;
 
     @Autowired
     ObjectMapper mapper;
@@ -65,15 +70,20 @@ public class KlientWriteModelService {
     }
 
     public List<JsonNode> getEventStore(){
-        final List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
         final ArrayList<JsonNode> result = new ArrayList<>();
-        eventStoreItems.stream().forEach(item -> {
-            try {
-                result.add(mapper.readTree(item.getData()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        });
+        List<AggregateItem> klientAggregates = aggregateRepository.findByType("klient");
+        for (AggregateItem aggregateItem: klientAggregates){
+            String key = aggregateItem.getBusinesskey();
+            List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateId(key);
+            events.stream().forEach(item -> {
+                try {
+                    result.add(mapper.readTree(item.getData()));
+                } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                }
+            });
+        }
+
         return result;
     }
 
@@ -90,14 +100,32 @@ public class KlientWriteModelService {
 
     @EventListener
     public void initRepo(ContextRefreshedEvent event){
-        final List<EventStoreItem> eventStoreItems = eventStore.getEventStoryByAggregate(KlientAggregate.this_aggregate_type.name());
-        eventStoreItems.stream().forEach(item -> {
-            try {
-                processor.process(mapper.readTree(item.getData()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        });
+        List<AggregateItem> klientAggregates = aggregateRepository.findByType("klient");
+        for (AggregateItem aggregateItem: klientAggregates){
+            String key = aggregateItem.getBusinesskey();
+            List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateId(key);
+            events.stream().forEach(item -> {
+                try {
+                    log.info("Sourcing for event "+item.getId()+", businessValue: "+item.getBusinesskey());
+                    processor.process(mapper.readTree(item.getData()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
 
+
+        //         = eventSt.findByType("klient");
+//        final List<AggregateItem> aggregateStoreItems = aggrateStore.findAll();
+//        for (AggregateItem aggregateItem: aggregateStoreItems){
+//            List<EventStoreItem> events = aggregateItem.getEvents();
+//            events.stream().forEach(item -> {
+//                try {
+//                    processor.process(mapper.readTree(item.getData()));
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//        }
     }
 }

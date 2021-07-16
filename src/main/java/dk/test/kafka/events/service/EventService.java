@@ -35,13 +35,21 @@ public class EventService {
 
     @Transactional
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
-        AggregateItem klientAggregateItem = aggregateRepository.findByType(businessEvent.getAggregateType().name());
+        AggregateItem klientAggregateItem = aggregateRepository.findByType(businessEvent.getAggregateType().name(), businessEvent.getKey());
+        if (klientAggregateItem == null){
+            klientAggregateItem = new AggregateItem();
+            klientAggregateItem.setId(UUID.randomUUID());
+            klientAggregateItem.setBusinesskey(businessEvent.getKey());
+            //todo - read this value from properties
+            klientAggregateItem.setType("klient");
+        }
         businessEvent.setVersion(klientAggregateItem.getVersion());
         businessEvent.setCreated_at(Instant.now());
         EventStoreItem eventStoreItem = new EventStoreItem();
+        eventStoreItem.setId(UUID.randomUUID());
         eventStoreItem.setActor(businessEvent.getActor());
-        eventStoreItem.setAggregateid(klientAggregateItem.getAggregateid());
 
+        //todo inspect this
         String strEvent = null;
         try {
              strEvent = mapper.writeValueAsString(businessEvent);
@@ -49,13 +57,17 @@ public class EventService {
             System.out.println(e);
         }
         eventStoreItem.setData(strEvent);
-        eventStoreItem.setKey(businessEvent.getKey());
+        eventStoreItem.setBusinesskey(businessEvent.getKey());
         eventStoreItem.setVersion(klientAggregateItem.getVersion());
         eventStoreItem.setRequestId(businessEvent.getRequestId());
         eventStoreItem.setCreated_at(new Date(businessEvent.getCreated_at().toEpochMilli()));
-        eventStoreRepository.saveAndFlush(eventStoreItem);
+        //TODO do more with sequence number - or remove it
+        eventStoreItem.setSequencenumber(Long.valueOf(0));
+        //TODO consider also setting the aggregate name to eventstoreItems
+        //eventStoreItem.setAggregate(klientAggregateItem);
         klientAggregateItem.setVersion(klientAggregateItem.getVersion()+1);
         aggregateRepository.save(klientAggregateItem);
+        eventStoreRepository.save(eventStoreItem);
     }
 
     @PostConstruct
