@@ -36,9 +36,6 @@ public class ApplicationConfig {
     @Autowired
     KafkaProperties kafkaProperties;
 
-    @Autowired
-    EventProcessor processor;
-
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
@@ -57,11 +54,6 @@ public class ApplicationConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    @KafkaListener(id = "klient_application", topics = "event.dataengineer.inventory.eventstore")
-    public void listen (@Payload JsonNode businessEvent, @Headers MessageHeaders messageHeaders, Acknowledgment ack){
-        processor.process(businessEvent);
-        ack.acknowledge();
-    }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String>

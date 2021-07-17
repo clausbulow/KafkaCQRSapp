@@ -1,4 +1,4 @@
-package dk.test.klient.model;
+package dk.test.klient.model.write;
 
 import dk.test.kafka.events.annotations.Aggregate;
 import dk.test.kafka.events.annotations.AggregateIdentifier;
@@ -22,4 +22,5 @@ public class KlientItem {
     String cpr;
     String fornavn;
     String efternavn;
+    long version;
 }

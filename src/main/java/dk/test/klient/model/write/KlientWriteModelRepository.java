@@ -1,6 +1,5 @@
 package dk.test.klient.model.write;
 
-import dk.test.klient.model.KlientItem;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
