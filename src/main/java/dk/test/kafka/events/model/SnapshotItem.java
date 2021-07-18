@@ -4,32 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name="eventstore")
+@Table(name="snapshots")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventStoreItem {
+
+public class SnapshotItem {
     @Id
     @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
     UUID id;
-
-    @SequenceGenerator(name="eventstore_sequencenumber_seq",
-            sequenceName="eventstore_sequencenumber_seq",
-            allocationSize=1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "eventstore_sequencenumber_seq")
-    Long sequencenumber;
-
+    String type;
     String businesskey;
-
     String actor;
-    String requestId;
     long version;
     Date created_at;
     String data;
-
 }

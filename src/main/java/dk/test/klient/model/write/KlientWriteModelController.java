@@ -41,4 +41,11 @@ public class KlientWriteModelController {
         return ResponseEntity.accepted().body(service.getEventStore());
     }
 
+    @PostMapping("/snapshots")
+    public ResponseEntity<?> createSnapshots()  {
+        log.debug("query all-clients called");
+        return ResponseEntity.accepted().build();
+    }
+
+
 }

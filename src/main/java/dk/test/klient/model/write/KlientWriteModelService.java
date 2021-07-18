@@ -3,10 +3,7 @@ package dk.test.klient.model.write;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.test.kafka.events.model.AggregateItem;
-import dk.test.kafka.events.model.AggregateRepository;
-import dk.test.kafka.events.model.EventStoreItem;
-import dk.test.kafka.events.model.EventStoreRepository;
+import dk.test.kafka.events.model.*;
 import dk.test.kafka.events.service.EventProcessor;
 import dk.test.klient.model.KlientDTO;
 import dk.test.klient.model.eventsobject.KlientOprettetObject;
@@ -34,6 +31,9 @@ public class KlientWriteModelService {
 
     @Autowired
     AggregateRepository aggregateRepository;
+
+    @Autowired
+    SnapshotRepository snapshotRepository;
 
     @Autowired
     ObjectMapper mapper;
@@ -95,6 +95,11 @@ public class KlientWriteModelService {
         return Optional.ofNullable(klient);
     }
 
+    public void createSnapshots(){
+        new SnapshotItem();
+
+    }
+
 
     @EventListener
     public void initRepo(ContextRefreshedEvent event){
@@ -111,19 +116,5 @@ public class KlientWriteModelService {
                 }
             });
         }
-
-
-        //         = eventSt.findByType("klient");
-//        final List<AggregateItem> aggregateStoreItems = aggrateStore.findAll();
-//        for (AggregateItem aggregateItem: aggregateStoreItems){
-//            List<EventStoreItem> events = aggregateItem.getEvents();
-//            events.stream().forEach(item -> {
-//                try {
-//                    processor.process(mapper.readTree(item.getData()));
-//                } catch (JsonProcessingException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//        }
     }
 }

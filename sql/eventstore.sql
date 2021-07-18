@@ -3,6 +3,7 @@ set schema 'inventory';
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 drop table inventory.eventstore;
 drop table inventory.aggregates;
+drop table inventory.snapshots;
 
 CREATE TABLE inventory.eventstore (
   id uuid  DEFAULT uuid_generate_v4() primary key,
@@ -16,19 +17,21 @@ CREATE TABLE inventory.eventstore (
 )
 ;
 
-SELECT
-    relname sequence_name
-FROM
-    pg_class
-WHERE
-        relkind = 'S';
-
-
 create table inventory.aggregates (
   id uuid  DEFAULT uuid_generate_v4() primary key,
   type varchar(200),
   businesskey varchar(255),
   version bigint
+);
+
+create table inventory.snapshots (
+                                      id uuid  DEFAULT uuid_generate_v4() primary key,
+                                      type varchar(200),
+                                      businesskey varchar(255),
+                                      actor varchar(100),
+                                      version bigint,
+                                      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                                      data text
 );
 
 select * from inventory.aggregates;
