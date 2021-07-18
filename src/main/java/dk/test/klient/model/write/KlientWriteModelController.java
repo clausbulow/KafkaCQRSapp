@@ -43,7 +43,8 @@ public class KlientWriteModelController {
 
     @PostMapping("/snapshots")
     public ResponseEntity<?> createSnapshots()  {
-        log.debug("query all-clients called");
+        log.debug("create Snapshots called");
+        service.createSnapshots();
         return ResponseEntity.accepted().build();
     }
 
