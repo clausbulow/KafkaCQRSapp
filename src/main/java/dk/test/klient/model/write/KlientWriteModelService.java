@@ -72,7 +72,7 @@ public class KlientWriteModelService {
     public List<JsonNode> getEventStore(){
         final List<JsonNode> result = new ArrayList<>();
         final Map<String, Long> snapshotVersions = new HashMap<>();
-        final List<SnapshotItem> allSnaphots = snapshotRepository.findAll();
+        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShots();
         for (SnapshotItem snapshotItem: allSnaphots){
             try {
                 log.info("Snapshotting for "+snapshotItem.getId()+", businessValue: "+snapshotItem.getBusinesskey());
@@ -153,7 +153,7 @@ public class KlientWriteModelService {
     @Order(10)
     public void initRepo(ContextRefreshedEvent event){
         final Map<String, Long> snapshotVersions = new HashMap<>();
-        final List<SnapshotItem> allSnaphots = snapshotRepository.findAll();
+        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShots();
         for (SnapshotItem snapshotItem: allSnaphots){
             try {
                 log.info("Snapshotting for "+snapshotItem.getId()+", businessValue: "+snapshotItem.getBusinesskey());

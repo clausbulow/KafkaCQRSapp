@@ -39,5 +39,9 @@ select * from inventory.aggregates;
 select * from inventory.eventstore;
 
 select * from inventory.snapshots;
+
+select a from inventory.snapshots a
+    where a.version =  (select max(b.version) from inventory.snapshots b where b.businesskey = a.businesskey group by b.businesskey );
+
 delete from inventory.snapshots;
 
