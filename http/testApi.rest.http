@@ -27,7 +27,7 @@ requestId: transI1
 {
   "cpr": "021165-1411",
   "fornavn": "Jørgen",
-  "efternavn": "Jensen-Hansen-jensen"
+  "efternavn": "Jensen-Hansen"
 }
 
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 requestId: transId2
 
 {
-  "fornavn": "Hans Peter Bondesen",
+  "fornavn": "Hans Peter",
   "efternavn": "Jensens"
 }
 

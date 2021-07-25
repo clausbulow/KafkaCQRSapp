@@ -11,4 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Transactional
 public @interface EventHandler {
+    boolean onlyOnInit() default false;
 }

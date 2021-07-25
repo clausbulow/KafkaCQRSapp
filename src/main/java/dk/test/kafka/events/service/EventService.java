@@ -6,6 +6,7 @@ import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.kafka.events.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -29,13 +30,16 @@ public class EventService {
     @Autowired
     ObjectMapper mapper;
 
+    @Autowired
+    private ApplicationContext context;
+
     private Map<Class<?>, String> eventClassesToNames = new HashMap();
     private Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
 
 
     @Transactional
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
-        AggregateItem klientAggregateItem = aggregateRepository.findByType(businessEvent.getAggregateType().name(), businessEvent.getKey());
+        AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType().name(), businessEvent.getKey());
         if (klientAggregateItem == null){
             klientAggregateItem = new AggregateItem();
             klientAggregateItem.setId(UUID.randomUUID());
@@ -72,14 +76,25 @@ public class EventService {
 
     @PostConstruct
     public void initEventsList() throws Exception {
+        scanForBusinessObjects();
+    }
+
+
+
+
+
+
+    private void scanForBusinessObjects() throws Exception{
         ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
         //TODO more refined component-scanning here!
+        //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
         Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("dk.test.klient.model.eventsobject");
         for (BeanDefinition definition: candidateComponents){
             System.out.println(definition.getBeanClassName());
             Class clazz = Class.forName(definition.getBeanClassName());
+            //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
             BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
             String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
             eventClassesToNames.put(clazz, eventName);
@@ -92,11 +107,8 @@ public class EventService {
         return this.eventClassesToNames.get(clazz);
     }
 
-    public boolean hasEvent(String eventName){
-        return this.eventNamesToClasses.containsKey(eventName);
-    }
-
     public Class<?> getEventClass (String eventName){
         return this.eventNamesToClasses.get(eventName);
     }
+
 }

@@ -24,7 +24,7 @@ public class KafkaEventHandler {
     @KafkaListener(id = "klient_application", topics = "event.dataengineer.inventory.eventstore")
     public void listen (@Payload JsonNode businessEvent, @Headers MessageHeaders messageHeaders, Acknowledgment ack){
         try {
-            validator.validateEvent(businessEvent);
+            //validator.validateEvent(businessEvent);
             processor.process(businessEvent);
             ack.acknowledge();
         } catch (Exception e) {

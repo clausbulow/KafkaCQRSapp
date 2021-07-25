@@ -38,5 +38,6 @@ select * from inventory.aggregates;
 
 select * from inventory.eventstore;
 
-select * from inventory.eventstore;
+select * from inventory.snapshots;
+delete from inventory.snapshots;
 

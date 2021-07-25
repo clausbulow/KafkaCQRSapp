@@ -1,29 +1,21 @@
 package dk.test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import dk.test.kafka.events.service.EventProcessor;
+import dk.test.klient.model.DDDEventListenerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.annotation.EnableKafkaStreams;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.Headers;
-import org.springframework.messaging.handler.annotation.Payload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +27,7 @@ import java.util.Map;
 public class ApplicationConfig {
     @Autowired
     KafkaProperties kafkaProperties;
+
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
@@ -66,5 +59,19 @@ public class ApplicationConfig {
         return factory;
     }
 
+    //@Bean
+    DDDEventListenerFactory dddEventListenerFactory(){
+        return new DDDEventListenerFactory();
+    }
+
+
+    public ApplicationEventMulticaster applicationEventMulticaster (ApplicationContext context){
+       // @Bean(name = "applicationEventMulticaster")
+       // public ApplicationEventMulticaster simpleApplicationEventMulticaster() {
+            SimpleApplicationEventMulticaster eventMulticaster =
+                    new BusinessEventsMulticaster();
+            //eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
+            return eventMulticaster;
+    }
 
 }
