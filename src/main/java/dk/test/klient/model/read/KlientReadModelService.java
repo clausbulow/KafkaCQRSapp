@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+//Services exposed by the read model - perspectiv on customers mainained by BusninessEvents in the @EventHandler annotated
+//Methods
 @Service
 @Slf4j
 public class KlientReadModelService {
-    private AtomicLong currentEventVersion = new AtomicLong(Long.valueOf(-1));
 
     @Autowired
     KlientJpaRepository repository;
@@ -41,11 +42,9 @@ public class KlientReadModelService {
         return Optional.ofNullable(klient);
     }
 
+    //Private method - only called during event-handling
     private void retKlient(KlientRettetObject klient, long version) throws Exception {
         KlientItem klientItem = repository.findById(klient.getCpr()).orElse(new KlientItem());
-        if (!currentEventVersion.compareAndSet(version-1,version)) {
-            log.error("Invalid version when writing to tho klient re<d model.");
-        }
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
@@ -61,18 +60,19 @@ public class KlientReadModelService {
     }
 
 
+    //Eventhandling...
     @EventHandler
     public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception {
         KlientRettetObject klient = event.getObject();
         retKlient(klient, event.getVersion());
-        System.out.println("Klient rettet i read-model");
+        log.info("Klient rettet i read-model");
     }
 
     @EventHandler
     public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception {
         KlientOprettetObject klient = event.getObject();
         opretKlient(klient, event.getVersion());
-        System.out.println("Klient oprettet i read-model");
+        log.info("Klient oprettet i read-model");
     }
 
 

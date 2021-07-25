@@ -27,7 +27,7 @@ requestId: transI1
 {
   "cpr": "021165-1411",
   "fornavn": "Jørgen",
-  "efternavn": "Jensen-Hansen"
+  "efternavn": "Jensen"
 }
 
 
@@ -38,7 +38,7 @@ requestId: transId2
 
 {
   "fornavn": "Hans Peter",
-  "efternavn": "Jensens"
+  "efternavn": "Hansen"
 }
 
 ### Hent klienter fra readmodel
