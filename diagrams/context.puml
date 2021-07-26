@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+Participant quyery as "Query Model" << BusinessApplication >>
+Participant internal as "Internal Messaging" << BusinessApplication >>
+Participant writeModel as "Application Write-Model" << BusinessApplication >>
+Participant localDBWrite as "LocalDB" << BusinessApplication >>
+Participant stateStore as "State Store"
+Participant connector as "Debezium Connector"
+Participant broker as "Kafka Broker"
+Participant transformer as "cdc2EventTransformer" <<Kafka Streams application>>
+Participant reciever as "Application message reciever" << BusinessApplication >>
+Participant readModel as "Application Read-Model" << BusinessApplication >>
+Participant localDBRead as "LocalDB" << BusinessApplication >>
+
+quyery -> internal: Command
+internal -> writeModel: Command
+writeModel -> writeModel: verify
+writeModel -> localDBWrite: update Write-Model
+writeModel -> stateStore: BusinessEvent
+stateStore --> connector: CDCEvent
+connector -> broker: CDCEvent
+broker --> transformer:CDCEvent
+transformer --> broker: BusinessEvent
+broker --> reciever: BusinessEvent
+reciever --> internal: BusinessEvent
+internal -> readModel: BusinessEvent
+readModel -> localDBRead: update Read-Model
+
+
+
+@enduml

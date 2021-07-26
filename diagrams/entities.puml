@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Snapshots {
+    UUID id;
+    String type;
+    String businesskey;
+    String actor;
+    long version;
+    Date created_at;
+    String data;
+}
+class Aggregates{
+    UUID id;
+    long version;
+    String businesskey;
+    String type;
+}
+class Eventstore{
+    UUID id;
+    String businesskey;
+    String actor;
+    String requestId;
+    long version;
+    Date created_at;
+    String data;
+}
+
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+package "Application" {
+  [Write Model] --> Postgres : Business Events
+  [Write Model] --> java : Business Data
+  [Read Model] --> H2: Perspective on Business Data
+}
+
+
+database "Postgres" {
+}
+
+database "H2" {
+}
+
+database "Java-Map (in-memory)" as java {
+}
+
+note bottom of java
+  The java Map "database" is just a simple in memory
+  Hashmap containing the Business Data required to validate
+  Commands.
+end note
+
+note bottom of H2
+  The H2 database is an in memory
+  in process database
+end note
+@enduml
