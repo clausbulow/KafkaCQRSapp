@@ -1,10 +1,8 @@
-package dk.test.klient.model;
+package dk.test.kafka.events.internal;
 
-import dk.test.kafka.events.annotations.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ApplicationListenerMethodAdapter;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.DefaultEventListenerFactory;
 import org.springframework.context.event.EventListener;

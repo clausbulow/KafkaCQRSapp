@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.test.kafka.events.model.*;
 import dk.test.kafka.events.service.EventProcessor;
 import dk.test.klient.model.KlientDTO;
-import dk.test.klient.model.eventsobject.KlientOprettetObject;
-import dk.test.klient.model.eventsobject.KlientRettetObject;
+import dk.test.klient.model.eventobjects.KlientOprettetObject;
+import dk.test.klient.model.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -43,6 +43,9 @@ public class KlientWriteModelService {
     @Autowired
     EventProcessor eventProcessor;
 
+    @Autowired
+    EventStore2EventSourceProcessor eventStore2EventSourceProcessor;
+
     public void retKlient(KlientRettetObject klient, long version) throws Exception{
         KlientItem klientItem = klientRepository.findById(klient.getCpr()).orElse(new KlientItem());
         if (!currentEventVersion.compareAndSet(version-1,version)) {
@@ -70,35 +73,7 @@ public class KlientWriteModelService {
     }
 
     public List<JsonNode> getEventStore(){
-        final List<JsonNode> result = new ArrayList<>();
-        final Map<String, Long> snapshotVersions = new HashMap<>();
-        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShots();
-        for (SnapshotItem snapshotItem: allSnaphots){
-            try {
-                log.info("Snapshotting for "+snapshotItem.getId()+", businessValue: "+snapshotItem.getBusinesskey());
-                result.add(mapper.readTree(snapshotItem.getData()));
-                snapshotVersions.put(snapshotItem.getBusinesskey(), snapshotItem.getVersion());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        }
-
-        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey("klient");
-
-        for (AggregateItem aggregateItem: klientAggregates){
-            final String key = aggregateItem.getBusinesskey();
-            final Long version = Optional.<Long>ofNullable(snapshotVersions.get(key)).orElse(Long.valueOf(-1));
-            final List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateIdAndVersion(key, version);
-            events.stream().forEach(item -> {
-                try {
-                    log.info("Sourcing for event "+item.getId()+", businessValue: "+item.getBusinesskey());
-                    result.add(mapper.readTree(item.getData()));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
-        return result;
+        return eventStore2EventSourceProcessor.execute();
     }
 
     public Optional<KlientDTO> getKlient(String cpr) {
@@ -152,32 +127,7 @@ public class KlientWriteModelService {
     @EventListener
     @Order(10)
     public void initRepo(ContextRefreshedEvent event){
-        final Map<String, Long> snapshotVersions = new HashMap<>();
-        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShots();
-        for (SnapshotItem snapshotItem: allSnaphots){
-            try {
-                log.info("Snapshotting for "+snapshotItem.getId()+", businessValue: "+snapshotItem.getBusinesskey());
-                eventProcessor.process(mapper.readTree(snapshotItem.getData()));
-                snapshotVersions.put(snapshotItem.getBusinesskey(), snapshotItem.getVersion());
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        }
+        eventStore2EventSourceProcessor.execute().forEach(eventStoreItem -> eventProcessor.process(eventStoreItem) );
 
-        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey("klient");
-
-        for (AggregateItem aggregateItem: klientAggregates){
-            final String key = aggregateItem.getBusinesskey();
-            final Long version = Optional.<Long>ofNullable(snapshotVersions.get(key)).orElse(Long.valueOf(-1));
-            final List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateIdAndVersion(key, version);
-            events.stream().forEach(item -> {
-                try {
-                    log.info("Sourcing for event "+item.getId()+", businessValue: "+item.getBusinesskey());
-                    eventProcessor.process(mapper.readTree(item.getData()));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
     }
 }

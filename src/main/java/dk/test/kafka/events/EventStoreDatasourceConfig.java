@@ -21,8 +21,10 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "eventstoreEntityManager",
-        transactionManagerRef = "eventstoreTransactionManager", basePackages = {"dk.test.kafka.events.model"})
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "eventstoreEntityManager",
+        transactionManagerRef = "eventstoreTransactionManager",
+        basePackages = {"dk.test.kafka.events.model"})
 @PropertySource({"classpath:persistence-multiple-db-boot.properties"})
 public class EventStoreDatasourceConfig {
     @Bean("eventstoreProps")
@@ -44,11 +46,8 @@ public class EventStoreDatasourceConfig {
 
     @Bean("eventstoreEntityManager")
     LocalContainerEntityManagerFactoryBean eventstoreEntityManager(@Qualifier("eventstoreDatasource") DataSource ds) {
-
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(true);
-
-
+        vendorAdapter.setGenerateDdl(false);
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(ds);
         factoryBean.setJpaVendorAdapter(vendorAdapter);

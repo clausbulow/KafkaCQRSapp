@@ -90,7 +90,7 @@ public class EventService {
         scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
         //TODO more refined component-scanning here!
         //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("dk.test.klient.model.eventsobject");
+        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("dk.test.klient.model.eventobjects");
         for (BeanDefinition definition: candidateComponents){
             System.out.println(definition.getBeanClassName());
             Class clazz = Class.forName(definition.getBeanClassName());

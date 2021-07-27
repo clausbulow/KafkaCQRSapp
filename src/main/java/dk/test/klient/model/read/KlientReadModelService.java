@@ -4,8 +4,8 @@ import dk.test.kafka.events.annotations.EventHandler;
 import dk.test.kafka.events.model.BusinessEvent;
 import dk.test.klient.model.KlientDTO;
 import dk.test.klient.model.write.KlientItem;
-import dk.test.klient.model.eventsobject.KlientOprettetObject;
-import dk.test.klient.model.eventsobject.KlientRettetObject;
+import dk.test.klient.model.eventobjects.KlientOprettetObject;
+import dk.test.klient.model.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 //Services exposed by the read model - perspectiv on customers mainained by BusninessEvents in the @EventHandler annotated
 //Methods
