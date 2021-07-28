@@ -1,4 +1,4 @@
-package dk.test.kafka.events.internal;
+package dk.test.kafka.events.internalmessages;
 
 import dk.test.kafka.events.annotations.EventHandler;
 import org.springframework.context.event.ApplicationListenerMethodAdapter;

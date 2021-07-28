@@ -11,9 +11,9 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.*;
@@ -37,21 +37,23 @@ public class EventService {
     private Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
 
 
-    @Transactional
+    @Transactional(transactionManager = "eventstoreTransactionManager")
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
-        AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType().name(), businessEvent.getKey());
+        AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
         if (klientAggregateItem == null){
             klientAggregateItem = new AggregateItem();
             klientAggregateItem.setId(UUID.randomUUID());
             klientAggregateItem.setBusinesskey(businessEvent.getKey());
             //todo - read this value from properties
-            klientAggregateItem.setType("klient");
+            klientAggregateItem.setActor(businessEvent.getActor());
+            klientAggregateItem.setAggregatetype(businessEvent.getAggregateType());
         }
         businessEvent.setVersion(klientAggregateItem.getVersion());
         businessEvent.setCreated_at(Instant.now());
         EventStoreItem eventStoreItem = new EventStoreItem();
         eventStoreItem.setId(UUID.randomUUID());
         eventStoreItem.setActor(businessEvent.getActor());
+        eventStoreItem.setAggregatetype(businessEvent.getAggregateType());
 
         //todo inspect this
         String strEvent = null;
@@ -65,10 +67,6 @@ public class EventService {
         eventStoreItem.setVersion(klientAggregateItem.getVersion());
         eventStoreItem.setRequestId(businessEvent.getRequestId());
         eventStoreItem.setCreated_at(new Date(businessEvent.getCreated_at().toEpochMilli()));
-        //TODO do more with sequence number - or remove it
-        eventStoreItem.setSequencenumber(Long.valueOf(0));
-        //TODO consider also setting the aggregate name to eventstoreItems
-        //eventStoreItem.setAggregate(klientAggregateItem);
         klientAggregateItem.setVersion(klientAggregateItem.getVersion()+1);
         aggregateRepository.save(klientAggregateItem);
         eventStoreRepository.save(eventStoreItem);

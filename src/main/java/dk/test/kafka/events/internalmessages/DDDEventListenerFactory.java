@@ -1,4 +1,4 @@
-package dk.test.kafka.events.internal;
+package dk.test.kafka.events.internalmessages;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

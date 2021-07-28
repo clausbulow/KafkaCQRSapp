@@ -9,6 +9,7 @@ import dk.test.klient.model.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class KlientReadModelService {
 
     //Eventhandling...
     @EventHandler
+    @Transactional
     public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception {
         KlientRettetObject klient = event.getObject();
         retKlient(klient, event.getVersion());
@@ -68,6 +70,7 @@ public class KlientReadModelService {
     }
 
     @EventHandler
+    @Transactional
     public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception {
         KlientOprettetObject klient = event.getObject();
         opretKlient(klient, event.getVersion());

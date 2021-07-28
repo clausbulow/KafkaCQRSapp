@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,7 +20,8 @@ public class SnapshotItem {
     @Id
     @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
     UUID id;
-    String type;
+    @Enumerated(EnumType.STRING)
+    AggregateTypes aggregatetype;
     String businesskey;
     String actor;
     long version;

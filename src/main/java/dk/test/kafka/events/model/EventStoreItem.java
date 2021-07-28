@@ -21,12 +21,11 @@ public class EventStoreItem {
     @SequenceGenerator(name="eventstore_sequencenumber_seq",
             sequenceName="eventstore_sequencenumber_seq",
             allocationSize=1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "eventstore_sequencenumber_seq")
-    Long sequencenumber;
 
     String businesskey;
-
     String actor;
+    @Enumerated(EnumType.STRING)
+    private AggregateTypes aggregatetype;
     String requestId;
     long version;
     Date created_at;

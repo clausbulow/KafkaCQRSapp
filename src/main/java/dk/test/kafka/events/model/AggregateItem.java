@@ -20,6 +20,8 @@ public class AggregateItem {
     @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
     UUID id;
     long version;
+    String actor;
+    @Enumerated(EnumType.STRING)
+    private AggregateTypes aggregatetype;
     String businesskey;
-    String type;
 }

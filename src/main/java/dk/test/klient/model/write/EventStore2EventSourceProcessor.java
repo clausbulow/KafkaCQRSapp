@@ -38,7 +38,7 @@ public class EventStore2EventSourceProcessor {
             }
         }
 
-        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey("klient");
+        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey(AggregateTypes.klient);
 
         for (AggregateItem aggregateItem: klientAggregates) {
             final String key = aggregateItem.getBusinesskey();

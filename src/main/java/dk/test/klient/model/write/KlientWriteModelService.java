@@ -91,7 +91,7 @@ public class KlientWriteModelService {
     public void createSnapshots() throws Exception{
         Collection<KlientItem> allKlients = klientRepository.findAll();
         for (KlientItem klient: allKlients){
-            AggregateItem aggregateItem = aggregateRepository.findByTypeAndKey(AggregateTypes.klient.name(), klient.getCpr());
+            AggregateItem aggregateItem = aggregateRepository.findByTypeAndKey(AggregateTypes.klient, klient.getCpr());
             KlientOprettetObject klientOprettetObject = KlientOprettetObject.builder().
                     cpr(klient.getCpr()).
                     fornavn(klient.getFornavn()).
@@ -110,7 +110,7 @@ public class KlientWriteModelService {
             SnapshotItem snapshotItem = SnapshotItem.builder().
                     id(UUID.randomUUID()).
                     actor("KS").
-                    type(AggregateTypes.klient.name()).
+                    aggregatetype(AggregateTypes.klient).
                     businesskey(klient.getCpr()).
                     version(aggregateItem.getVersion()).
                     created_at(new Date(Instant.now().toEpochMilli())).
@@ -124,6 +124,7 @@ public class KlientWriteModelService {
     }
 
 
+    //Executes on application initialization
     @EventListener
     @Order(10)
     public void initRepo(ContextRefreshedEvent event){

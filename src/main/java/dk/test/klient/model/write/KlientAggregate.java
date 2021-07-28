@@ -50,7 +50,7 @@ public class KlientAggregate  {
     public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
         KlientRettetObject klient = event.getObject();
         klientWriteModelService.retKlient(klient, event.getVersion());
-        log.info("Klient rettet i writemodel");
+        log.debug("Klient rettet i writemodel");
     }
 
     @CommandHandler
