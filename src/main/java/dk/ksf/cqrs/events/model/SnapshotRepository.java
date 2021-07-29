@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface SnapshotRepository extends JpaRepository<SnapshotItem, Long> {
-    @Query("select a from SnapshotItem a  where a.version =  (select max(b.version) from SnapshotItem b where b.businesskey = a.businesskey group by b.businesskey)" )
-    List<SnapshotItem> findLatestSnapShots();
+    @Query("select a from SnapshotItem a where a.aggregatetype = ?1 and a.version =  (select max(b.version) from SnapshotItem b where b.businesskey = a.businesskey group by b.businesskey)" )
+    List<SnapshotItem> findLatestSnapShotsForAggregate(AggregateTypes aggregateType);
 }

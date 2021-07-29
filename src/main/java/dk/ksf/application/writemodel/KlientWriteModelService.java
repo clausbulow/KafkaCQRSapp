@@ -6,6 +6,7 @@ import dk.ksf.cqrs.events.model.*;
 import dk.ksf.cqrs.events.service.EventProcessor;
 import dk.ksf.application.common.KlientItem;
 import dk.ksf.application.common.dto.KlientDTO;
+import dk.ksf.cqrs.events.service.EventStore2EventSourceProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -67,7 +68,7 @@ public class KlientWriteModelService {
     }
 
     public List<JsonNode> getEventStore(){
-        return eventStore2EventSourceProcessor.execute();
+        return eventStore2EventSourceProcessor.execute(AggregateTypes.klient);
     }
 
     public Optional<KlientDTO> getKlient(String cpr) {
@@ -122,7 +123,7 @@ public class KlientWriteModelService {
     @EventListener
     @Order(10)
     public void initRepo(ContextRefreshedEvent event){
-        eventStore2EventSourceProcessor.execute().forEach(eventStoreItem -> eventProcessor.process(eventStoreItem) );
+        eventStore2EventSourceProcessor.execute(AggregateTypes.klient).forEach(eventStoreItem -> eventProcessor.process(eventStoreItem) );
 
     }
 }

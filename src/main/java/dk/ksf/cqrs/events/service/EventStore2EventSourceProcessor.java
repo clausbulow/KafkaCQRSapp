@@ -1,4 +1,4 @@
-package dk.ksf.application.writemodel;
+package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,10 +23,10 @@ public class EventStore2EventSourceProcessor {
     @Autowired
     EventStoreRepository eventStoreRepository;
 
-    public  List<JsonNode> execute(){
+    public  List<JsonNode> execute(AggregateTypes aggregateType){
         final List<JsonNode> result = new ArrayList<>();
         final Map<String, Long> snapshotVersions = new HashMap<>();
-        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShots();
+        final List<SnapshotItem> allSnaphots = snapshotRepository.findLatestSnapShotsForAggregate(aggregateType);
         for (SnapshotItem snapshotItem: allSnaphots){
             try {
                 log.info("Snapshotting for "+snapshotItem.getId()+", businessValue: "+snapshotItem.getBusinesskey());
@@ -37,12 +37,12 @@ public class EventStore2EventSourceProcessor {
             }
         }
 
-        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey(AggregateTypes.klient);
+        final List<AggregateItem> klientAggregates = aggregateRepository.findByTypeAndKey(aggregateType);
 
         for (AggregateItem aggregateItem: klientAggregates) {
             final String key = aggregateItem.getBusinesskey();
             final Long version = Optional.<Long>ofNullable(snapshotVersions.get(key)).orElse(Long.valueOf(-1));
-            final List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateIdAndVersion(key, version);
+            final List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateIdAndVersion(aggregateType, key, version);
             events.stream().forEach(item -> {
                 try {
                     log.info("Sourcing for event " + item.getId() + ", businessValue: " + item.getBusinesskey());
