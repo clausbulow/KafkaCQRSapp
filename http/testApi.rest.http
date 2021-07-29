@@ -59,10 +59,20 @@ requestId: transI1
 
 {
   "cpr": "021165-1419",
-  "fornavn": "Rasmus",
+  "fornavn": "Jørgen",
   "efternavn": "Dietrich"
 }
 
+### Ret klient
+PUT http://localhost:8081/commands/klient/021165-1419
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1419",
+  "fornavn": "Jørgen",
+  "efternavn": "Dietrich"
+}
 
 ###
 PUT http://localhost:8081/commands/klient/021165-1411
