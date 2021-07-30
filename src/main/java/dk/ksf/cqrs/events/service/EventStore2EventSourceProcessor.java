@@ -3,9 +3,13 @@ package dk.ksf.cqrs.events.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -22,6 +26,10 @@ public class EventStore2EventSourceProcessor {
     AggregateRepository aggregateRepository;
     @Autowired
     EventStoreRepository eventStoreRepository;
+    @Autowired
+    CqrsProperties props;
+    @Autowired
+    EventProcessor eventProcessor;
 
     public  List<JsonNode> execute(AggregateTypes aggregateType){
         final List<JsonNode> result = new ArrayList<>();
@@ -53,7 +61,13 @@ public class EventStore2EventSourceProcessor {
             });
         }
         return result;
+    }
 
+    @EventListener
+    @Order(10)
+    public void initRepo(ContextRefreshedEvent event){
+        props.getInitializeFromAggregates().forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> eventProcessor.process(eventStoreItem)));
 
     }
+
 }

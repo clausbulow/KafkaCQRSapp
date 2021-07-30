@@ -2,6 +2,7 @@ package dk.ksf.application.writemodel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.model.*;
 import dk.ksf.cqrs.events.service.EventProcessor;
 import dk.ksf.application.common.KlientItem;
@@ -41,6 +42,9 @@ public class KlientWriteModelService {
 
     @Autowired
     EventProcessor eventProcessor;
+
+    @Autowired
+    CqrsProperties props;
 
     @Autowired
     EventStore2EventSourceProcessor eventStore2EventSourceProcessor;
@@ -96,7 +100,7 @@ public class KlientWriteModelService {
                     eventNavn("klientOprettet_event").
                     key(klient.getCpr()).
                     requestId("snapshotter").
-                    actor("KS").aggregateType(AggregateTypes.klient).
+                    actor(props.getProducingActorId()).aggregateType(AggregateTypes.klient).
                     created_at(Instant.now()).
                     version(aggregateItem.getVersion()).
                     object(klientOprettetObject).
@@ -104,7 +108,7 @@ public class KlientWriteModelService {
             String strData = mapper.writeValueAsString(businessEvent);
             SnapshotItem snapshotItem = SnapshotItem.builder().
                     id(UUID.randomUUID()).
-                    actor("KS").
+                    actor(props.getProducingActorId()).
                     aggregatetype(AggregateTypes.klient).
                     businesskey(klient.getCpr()).
                     version(aggregateItem.getVersion()).
@@ -115,15 +119,6 @@ public class KlientWriteModelService {
             aggregateItem.setVersion(aggregateItem.getVersion()+1);
             aggregateRepository.save(aggregateItem);
         }
-
-    }
-
-
-    //Executes on application initialization
-    @EventListener
-    @Order(10)
-    public void initRepo(ContextRefreshedEvent event){
-        eventStore2EventSourceProcessor.execute(AggregateTypes.klient).forEach(eventStoreItem -> eventProcessor.process(eventStoreItem) );
 
     }
 }

@@ -25,9 +25,9 @@ public class EventProcessor  {
 
 
     public void process(JsonNode json) {
-        String eventNavn = json.get("eventNavn").asText();
-        String requestId =  json.get("requestId").asText();
-        String key = json.get("key").asText();
+        final String eventNavn = json.get("eventNavn").asText();
+        final String requestId =  json.get("requestId").asText();
+        final String key = json.get("key").asText();
         String actor = json.get("actor").asText();
         long version = 0;
         final Optional<JsonNode> optionalVersion = Optional.ofNullable(json.get("version"));

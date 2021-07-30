@@ -16,3 +16,5 @@ kfs:
     topicnames: event.dataengineer.inventory.eventstore
     eventobjectsPackage: dk.ksf.application.common.eventobjects
     producingActorId: KS
+    initializeFromAggregates:
+      - klient
