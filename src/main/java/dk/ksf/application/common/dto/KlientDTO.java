@@ -9,4 +9,5 @@ public class KlientDTO {
     String cpr;
     String fornavn;
     String efternavn;
+    long version;
 }

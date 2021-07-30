@@ -1,6 +1,5 @@
 package dk.ksf.application.writemodel;
 
-import dk.ksf.application.common.KlientItem;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -10,17 +9,17 @@ import java.util.Optional;
 
 @Component
 public class KlientWriteModelRepository {
-    private Map<String, KlientItem> klienter = new HashMap<>();
+    private Map<String, KlientWriteModelItem> klienter = new HashMap<>();
 
-    public Optional<KlientItem> findById(String id){
+    public Optional<KlientWriteModelItem> findById(String id){
         return Optional.of(klienter.get(id));
     }
 
-    public void save(KlientItem klientItem) {
+    public void save(KlientWriteModelItem klientItem) {
         klienter.put(klientItem.getCpr(), klientItem);
     }
 
-    public Collection<KlientItem> findAll() {
+    public Collection<KlientWriteModelItem> findAll() {
         return klienter.values();
     }
 }

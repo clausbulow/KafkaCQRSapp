@@ -3,7 +3,6 @@ package dk.ksf.application.readmodel;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.application.common.dto.KlientDTO;
-import dk.ksf.application.common.KlientItem;
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.common.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +32,10 @@ public class KlientReadModelService {
 
 
     public Optional<KlientDTO> getKlient(String cpr) {
-        final Optional<KlientItem> optionalKlientItem = repository.findById(cpr);
+        final Optional<KlientReadModelItem> optionalKlientItem = repository.findById(cpr);
         KlientDTO klient = null;
         if (optionalKlientItem.isPresent()) {
-            KlientItem klientItem = optionalKlientItem.get();
+            KlientReadModelItem klientItem = optionalKlientItem.get();
             klient = KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build();
         }
         return Optional.ofNullable(klient);
@@ -44,18 +43,20 @@ public class KlientReadModelService {
 
     //Private method - only called during event-handling
     private void retKlient(KlientRettetObject klient, long version) throws Exception {
-        KlientItem klientItem = repository.findById(klient.getCpr()).orElse(new KlientItem());
+        KlientReadModelItem klientItem = repository.findById(klient.getCpr()).orElse(new KlientReadModelItem());
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
+        klientItem.setVersion(version);
         repository.save(klientItem);
     }
 
     private void opretKlient(KlientOprettetObject klient, long version) throws Exception {
-        KlientItem klientItem = new KlientItem();
+        KlientReadModelItem klientItem = new KlientReadModelItem();
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
+        klientItem.setVersion(version);
         repository.save(klientItem);
     }
 

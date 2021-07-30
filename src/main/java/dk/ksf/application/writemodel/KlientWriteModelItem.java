@@ -1,4 +1,4 @@
-package dk.ksf.application.common;
+package dk.ksf.application.writemodel;
 
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Table(name="klienter")
 @Aggregate
-public class KlientItem {
+public class KlientWriteModelItem {
     @AggregateIdentifier
     @Id
     String cpr;

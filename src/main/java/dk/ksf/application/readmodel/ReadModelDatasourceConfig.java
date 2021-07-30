@@ -1,7 +1,6 @@
 package dk.ksf.application.readmodel;
 
 import com.zaxxer.hikari.HikariDataSource;
-import dk.ksf.application.common.KlientItem;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -62,7 +61,7 @@ public class ReadModelDatasourceConfig {
         factoryBean.setDataSource(ds);
         factoryBean.setJpaVendorAdapter(vendorAdapter);
         factoryBean.setJpaDialect(new DefaultJpaDialect());
-        factoryBean.setPackagesToScan(KlientItem.class.getPackage().getName());
+        factoryBean.setPackagesToScan(KlientReadModelItem.class.getPackage().getName());
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.setProperty("hibernate.hbm2ddl.auto", "create");
