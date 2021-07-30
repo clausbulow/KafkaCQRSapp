@@ -41,9 +41,6 @@ public class KlientWriteModelService {
     ObjectMapper mapper;
 
     @Autowired
-    EventProcessor eventProcessor;
-
-    @Autowired
     CqrsProperties props;
 
     @Autowired
