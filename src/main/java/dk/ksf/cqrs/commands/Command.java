@@ -6,4 +6,5 @@ import lombok.Data;
 public class Command {
     public String aggregateId;
     public String requestId;
+    public long version;
 }

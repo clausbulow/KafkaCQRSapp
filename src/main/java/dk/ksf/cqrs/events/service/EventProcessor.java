@@ -1,13 +1,12 @@
 package dk.ksf.cqrs.events.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.BusinessEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,10 +20,10 @@ public class EventProcessor  {
     ObjectMapper mapper;
 
     @Autowired
-    ApplicationEventPublisher publisher;
+    EventDispatcher publisher;
 
 
-    public void process(JsonNode json) {
+    public BusinessEvent<?> converToBusinessEvent(JsonNode json) throws Exception{
         final String eventNavn = json.get("eventNavn").asText();
         final String requestId =  json.get("requestId").asText();
         final String key = json.get("key").asText();
@@ -39,7 +38,6 @@ public class EventProcessor  {
             Class<?> eventClass = eventService.getEventClass(eventNavn);
 
             final JsonNode event = json.get("object");
-            try {
                 final Object eventObj = (Object) mapper.treeToValue((ObjectNode) event, eventClass);
                 BusinessEvent businessEvent =
                         BusinessEvent.builder().
@@ -50,11 +48,9 @@ public class EventProcessor  {
                                 version(version).
                                 object(eventObj).
                                 build();
-                publisher.publishEvent(businessEvent);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            };
+                return businessEvent;
 
         };
+        return null;
     }
 }

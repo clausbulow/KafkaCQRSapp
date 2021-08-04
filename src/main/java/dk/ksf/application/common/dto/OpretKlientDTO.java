@@ -5,9 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class KlientDTO {
+public class OpretKlientDTO {
     String cpr;
     String fornavn;
     String efternavn;
-    long version;
 }

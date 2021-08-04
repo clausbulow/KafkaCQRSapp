@@ -15,7 +15,6 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="klienter")
-@Aggregate
 public class KlientReadModelItem {
     @AggregateIdentifier
     @Id

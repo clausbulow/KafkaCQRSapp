@@ -2,8 +2,9 @@ package dk.ksf.cqrs.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.ksf.application.writemodel.KlientAggregate;
 import dk.ksf.application.writemodel.KlientWriteModelItem;
-import dk.ksf.cqrs.exceptions.InvalidEventVersionException;
+import dk.ksf.cqrs.exceptions.InvalidDataVersionException;
 import dk.ksf.application.writemodel.KlientWriteModelRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class EventValidator {
         final String key = businessEvent.get("key").asText();
         final long version = businessEvent.get("version").asLong();
         log.info("validating message "+ key);
-        final Optional<KlientWriteModelItem> optionalKlient = repository.findById(key);
+        final Optional<KlientAggregate> optionalKlient = repository.findById(key);
         if (optionalKlient.isPresent()){
             if ((optionalKlient.get().getVersion()+1) != version ){
-                throw new InvalidEventVersionException("Wrong Version recieved: "+version+", last version registered; "+optionalKlient.get().getVersion());
+                throw new InvalidDataVersionException("Wrong Version recieved: "+version+", last version registered; "+optionalKlient.get().getVersion());
             } else {
                 return;
             }

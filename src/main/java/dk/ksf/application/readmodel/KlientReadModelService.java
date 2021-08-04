@@ -1,8 +1,9 @@
 package dk.ksf.application.readmodel;
 
 import dk.ksf.cqrs.events.annotations.EventHandler;
+import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.model.BusinessEvent;
-import dk.ksf.application.common.dto.KlientDTO;
+import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.common.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
@@ -18,25 +19,26 @@ import java.util.Optional;
 //Methods
 @Service
 @Slf4j
+@Perspective
 public class KlientReadModelService {
 
     @Autowired
     KlientJpaRepository repository;
 
 
-    public List<KlientDTO> getAllKlienter() {
-        final List<KlientDTO> result = new ArrayList<>();
-        repository.findAll().stream().forEach(klientItem -> result.add(KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build()));
+    public List<RetKlientDTO> getAllKlienter() {
+        final List<RetKlientDTO> result = new ArrayList<>();
+        repository.findAll().stream().forEach(klientItem -> result.add(RetKlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build()));
         return result;
     }
 
 
-    public Optional<KlientDTO> getKlient(String cpr) {
+    public Optional<RetKlientDTO> getKlient(String cpr) {
         final Optional<KlientReadModelItem> optionalKlientItem = repository.findById(cpr);
-        KlientDTO klient = null;
+        RetKlientDTO klient = null;
         if (optionalKlientItem.isPresent()) {
             KlientReadModelItem klientItem = optionalKlientItem.get();
-            klient = KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build();
+            klient = RetKlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).build();
         }
         return Optional.ofNullable(klient);
     }

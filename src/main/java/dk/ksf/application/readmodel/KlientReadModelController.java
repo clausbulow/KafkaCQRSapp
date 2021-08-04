@@ -1,6 +1,6 @@
 package dk.ksf.application.readmodel;
 
-import dk.ksf.application.common.dto.KlientDTO;
+import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.application.writemodel.KlientWriteModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ import java.util.Optional;
 public class KlientReadModelController {
 
     @Autowired
-    KlientWriteModelService service;
+    KlientReadModelService service;
 
 
     @GetMapping("/klienter")
-    public ResponseEntity<List<KlientDTO>> allKlienter(@RequestHeader("requestId") String requestId)  {
+    public ResponseEntity<List<RetKlientDTO>> allKlienter(@RequestHeader("requestId") String requestId)  {
         log.debug("query all-clients called");
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
@@ -29,7 +29,7 @@ public class KlientReadModelController {
     @GetMapping("/klienter/{cpr}")
     public ResponseEntity<?> processKlientGetKlientRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId){
         ResponseEntity<?> result;
-        final Optional<KlientDTO> klient = service.getKlient(cpr);
+        final Optional<RetKlientDTO> klient = service.getKlient(cpr);
         if (klient.isPresent()){
             return ResponseEntity.accepted().body(klient.get());
         } else {
@@ -37,9 +37,5 @@ public class KlientReadModelController {
         }
     }
 
-    @GetMapping("/klienter/eventstore")
-    public ResponseEntity<?> processGetEventstoreRequest(@RequestHeader("requestId") String requestId) {
-        return ResponseEntity.accepted().body(service.getEventStore());
-    }
 
 }

@@ -2,9 +2,10 @@ package dk.ksf.application.writemodel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.ksf.application.writemodel.dto.CreateSnapshotsResponse;
 import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.model.*;
-import dk.ksf.application.common.dto.KlientDTO;
+import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.cqrs.events.service.EventStore2EventSourceProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,10 @@ public class KlientWriteModelService {
     EventStore2EventSourceProcessor eventStore2EventSourceProcessor;
 
     public void retKlient(KlientRettetObject klient, long version) throws Exception{
-        KlientWriteModelItem klientItem = klientRepository.findById(klient.getCpr()).orElse(new KlientWriteModelItem());
+        KlientAggregate klientItem = klientRepository.findById(klient.getCpr()).orElse(new KlientAggregate());
+ //       if (klientItem.getVersion()!= version-1){
+ //           throw new InvalidDataVersionException("Kan ikke opdatere klient - versionsnummer er forket. Forventede "+Long.valueOf(klientItem.getVersion()+1)+", men modtog "+version);
+ //       }
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
@@ -51,7 +55,7 @@ public class KlientWriteModelService {
     }
 
     public void opretKlient(KlientOprettetObject klient, long version) throws Exception{
-        KlientWriteModelItem klientItem = new KlientWriteModelItem();
+        KlientAggregate klientItem = new KlientAggregate();
         klientItem.setCpr(klient.getCpr());
         klientItem.setEfternavn(klient.getEfternavn());
         klientItem.setFornavn(klient.getFornavn());
@@ -59,9 +63,9 @@ public class KlientWriteModelService {
         klientRepository.save(klientItem);
     }
 
-    public List <KlientDTO> getAllKlienter(){
-        final List<KlientDTO> result = new ArrayList<>();
-        klientRepository.findAll().stream().forEach(klientItem -> result.add(KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).version(klientItem.getVersion()).build()));
+    public List <RetKlientDTO> getAllKlienter(){
+        final List<RetKlientDTO> result = new ArrayList<>();
+        klientRepository.findAll().stream().forEach(klientItem -> result.add(RetKlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).version(klientItem.getVersion()).build()));
         return result;
     }
 
@@ -69,21 +73,24 @@ public class KlientWriteModelService {
         return eventStore2EventSourceProcessor.execute(AggregateTypes.klient);
     }
 
-    public Optional<KlientDTO> getKlient(String cpr) {
-        final Optional<KlientWriteModelItem> optionalKlientItem = klientRepository.findById(cpr);
-        KlientDTO klient = null;
+    public Optional<RetKlientDTO> getKlient(String cpr) {
+        final Optional<KlientAggregate> optionalKlientItem = klientRepository.findById(cpr);
+        RetKlientDTO klient = null;
         if (optionalKlientItem.isPresent()){
-            KlientWriteModelItem klientItem = optionalKlientItem.get();
-            klient = KlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).version(klientItem.getVersion()).build();
+            KlientAggregate klientItem = optionalKlientItem.get();
+            klient = RetKlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).version(klientItem.getVersion()).build();
         }
         return Optional.ofNullable(klient);
     }
 
 
+
+
     @Transactional
-    public void createSnapshots() throws Exception{
-        Collection<KlientWriteModelItem> allKlients = klientRepository.findAll();
-        for (KlientWriteModelItem klient: allKlients){
+    public CreateSnapshotsResponse createSnapshots() throws Exception{
+        CreateSnapshotsResponse response = new CreateSnapshotsResponse();
+        Collection<KlientAggregate> allKlients = klientRepository.findAll();
+        for (KlientAggregate klient: allKlients){
             AggregateItem aggregateItem = aggregateRepository.findByTypeAndKey(AggregateTypes.klient, klient.getCpr());
             KlientOprettetObject klientOprettetObject = KlientOprettetObject.builder().
                     cpr(klient.getCpr()).
@@ -113,6 +120,8 @@ public class KlientWriteModelService {
             aggregateItem.setVersion(aggregateItem.getVersion()+1);
             aggregateRepository.save(aggregateItem);
         }
+        response.getSnapshotsCreatedForAggretateTypes().add("snapshots created for aggregatetype "+AggregateTypes.klient);
+        return  response;
 
     }
 }

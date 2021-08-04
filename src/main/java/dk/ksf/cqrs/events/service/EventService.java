@@ -41,7 +41,6 @@ public class EventService {
     private Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
 
 
-    @Transactional(transactionManager = "eventstoreTransactionManager")
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
         AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
         if (klientAggregateItem == null){

@@ -10,7 +10,6 @@ import lombok.Value;
 public class OpretKlientCommand extends Command {
     @TargetAggregateIdentifier
     String cpr;
-
     String fornavn;
     String efternavn;
 }

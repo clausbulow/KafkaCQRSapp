@@ -71,7 +71,8 @@ requestId: transI1
 {
   "cpr": "021165-1419",
   "fornavn": "Jørgen",
-  "efternavn": "Dietrich"
+  "efternavn": "Dietrich",
+  "version": 13
 }
 
 ###
