@@ -207,7 +207,6 @@ public class EventDispatcher {
             final Object aggregateItem = aggregateInfo.getAggregateClass().getDeclaredConstructor().newInstance();
             beanFactory.autowireBean(aggregateItem);
             keyField.set(aggregateItem,keyRefField.get(command));
-
             ReflectionUtils.invokeMethod( method, aggregateItem, command);
             aggregateInfo.repository.save(aggregateItem);
             log.info("Aggregate created..");

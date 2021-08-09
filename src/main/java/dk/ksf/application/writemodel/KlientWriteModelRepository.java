@@ -63,11 +63,13 @@ public class KlientWriteModelRepository implements CrudRepository<KlientAggregat
 
     @Override
     public void deleteAllById(Iterable<? extends String> iterable) {
+        iterable.forEach(id -> klienter.remove(id));
 
     }
 
     @Override
     public void deleteAll(Iterable<? extends KlientAggregate> iterable) {
+        iterable.forEach(klient -> klienter.remove(klient.getCpr()));
 
     }
 

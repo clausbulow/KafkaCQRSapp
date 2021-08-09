@@ -63,6 +63,30 @@ requestId: transI1
   "efternavn": "Dietrich"
 }
 
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1420",
+  "fornavn": "Lone",
+  "efternavn": "Dietrich"
+}
+
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1423",
+  "fornavn": "Ole",
+  "efternavn": "Rode"
+}
+
+
+
 ### Ret klient
 PUT http://localhost:8081/commands/klient/021165-1419
 Content-Type: application/json

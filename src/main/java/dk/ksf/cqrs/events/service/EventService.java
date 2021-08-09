@@ -37,8 +37,8 @@ public class EventService {
     @Autowired
     CqrsProperties props;
 
-    private Map<Class<?>, String> eventClassesToNames = new HashMap();
-    private Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
+    private final Map<Class<?>, String> eventClassesToNames = new HashMap<>();
+    private final Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
 
 
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
@@ -79,11 +79,6 @@ public class EventService {
     public void initEventsList() throws Exception {
         scanForBusinessObjects();
     }
-
-
-
-
-
 
     private void scanForBusinessObjects() throws Exception{
         ClassPathScanningCandidateComponentProvider scanner;

@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+Participant quyery as "Query Model" << BusinessApplication >>
+Participant aggregate as "Aggregate" << BusinessApplication >>
+Participant lifeCycleHanlder as "LifeCyckleHandler" << BusinessApplication >>
+Participant localDBWrite as "LocalDB" << BusinessApplication >>
+Participant stateStore as "StateStore" << BusinessApplication >>
+Participant perspective as "Perspective" << BusinessApplication >>
+Participant localDBRead as "LocalDB" << BusinessApplication >>
+
+quyery -> aggregate: CommandHandler(command)
+aggregate -> aggregate: Verify Command
+aggregate -> lifeCycleHanlder: Apply BusinessEvent
+lifeCycleHanlder -> aggregate: EvenSourcingHandler (BusinessEvent)
+aggregate -> localDBWrite: update Write-Model
+lifeCycleHanlder -> stateStore: fireEvent(BusinessEvent)
+stateStore --> perspective: EventHandler(BusinessEvent)
+perspective -> localDBRead: update Read-Model
+
+
+
+@enduml

@@ -5,7 +5,9 @@ autonumber
 
 Participant quyery as "Query Model" << BusinessApplication >>
 Participant internal as "Internal Messaging" << BusinessApplication >>
-Participant writeModel as "Application Write-Model" << BusinessApplication >>
+Participant writeModel as "Aggregate" << BusinessApplication >>
+Participant lifeCycleHanlder as "LifeCyckleHandler" << BusinessApplication >>
+
 Participant localDBWrite as "LocalDB" << BusinessApplication >>
 Participant stateStore as "State Store"
 Participant connector as "Debezium Connector"
@@ -16,17 +18,19 @@ Participant readModel as "Application Read-Model" << BusinessApplication >>
 Participant localDBRead as "LocalDB" << BusinessApplication >>
 
 quyery -> internal: Command
-internal -> writeModel: Command
-writeModel -> writeModel: verify
+internal -> writeModel: CommandHandler
+writeModel -> writeModel: Verify Command
+writeModel -> lifeCycleHanlder: Apply BusinessEvent
+lifeCycleHanlder -> writeModel: EvenSourcingHandler (BusinessEvent)
 writeModel -> localDBWrite: update Write-Model
-writeModel -> stateStore: BusinessEvent
+lifeCycleHanlder -> stateStore: fireEvent(BusinessEvent)
 stateStore --> connector: CDCEvent
 connector -> broker: CDCEvent
 broker --> transformer:CDCEvent
 transformer --> broker: BusinessEvent
 broker --> reciever: BusinessEvent
 reciever --> internal: BusinessEvent
-internal -> readModel: BusinessEvent
+internal -> readModel: EventHandler(BusinessEvent)
 readModel -> localDBRead: update Read-Model
 
 
