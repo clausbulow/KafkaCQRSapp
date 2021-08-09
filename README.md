@@ -51,15 +51,15 @@ Løsningen arbejder arbejder med 3 typer af handlers, nemlig:
 1. Commands skabes a Querymodellen og aftages i en Command-handler i et "Aggregate". Aggregaten skal validerer kommandoen og dernæste skabe et tilhørende forretningsevent.
 2. Forretningsevent/Business events skabes i et Aggregate og aftages dels i aggregatet selv i en "event sourcing handler" og dels af en eller flere "Event Handlers", der hvert hører sit "Perspektiv" til.
 "Event Sourcing handlers" opgave er at opdatere den instans af aggregatet, som Business Eventen addresserer.
-"Event handlers" opgave er, at opdaterer et pespektiv på de data, som et business event bærer på.
+"Event handlers" opgave er, at opdatere et pespektiv på de data, som et business-event bærer på.
 
 I et simplificeret kontext diagram, ser anvendelse af handlers således ud:
 ![Handlers](http://www.plantuml.com/plantuml/png/bPBBJiCm44Nt_Wgh6yeYP1zLaTg2nA98XKYmDiuqMFZLiLqfVq_UBrY4NMOqzyxrdDnzUMzT4iTMCks3aW_SgDZ1DO3c4EM25SWK8InueuFw12JapD0BBcmbeDTG0fQKERfv3VNNYyb1RkXkHm_12GtExQsLWZClZAPfEbEpea0ec8V6ODzNQ-LINE1OSWdFJCiSi74vjStlffjBmDLkXZFvUFX0qUKvjOsrUkUhw9atsAgpeLnhO06T1Ux5hNKuZ_K_t_06B5_x1D8XZD8HHqAFHgdgVDq9jxmjxyb8R3x_3YWkPI-RZoqn9RIEK0w1dcwWFVa5SxwW7ifCG2vqqQMYsvd38jmKPqA3pUj-KqNDF_hdmf5XGYy2eJ5Uhfc0ZYhD15iRq_TNM-YcVCU0DQiXNrrqyGZv0G00)
 
 ### Implementering af handlere
 
-De skabes ved at hjælp af annoteringer i koden - således kan en command-handler skabes således:
-```java
+Handlere skabes ved at hjælp af annoteringer i koden - således kan en command-handler skabes således:
+```
     @CommandHandler
     public void onRetKlientCommand(RetKlientCommand command) throws Exception{
         KlientRettetObject businessObject = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
@@ -77,7 +77,7 @@ De skabes ved at hjælp af annoteringer i koden - således kan en command-handle
 ```
 
 En event sourcing handler skabes tilsvarende:
-```java
+```
 @EventSourcingHandler
 public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
 KlientRettetObject klient = event.getObject();
@@ -92,7 +92,7 @@ Det skal bemærkes, at et Event Sourcing handler ALTID modtager objekter af "Bus
 
 En eventhandler implementeres i analogi med en eventsourcing-handler således:
 
-```java
+```
 @EventHandler
 public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception {
         KlientOprettetObject klient = event.getObject();
@@ -117,11 +117,11 @@ For hvert type af aggregate (klient, retskreds)
       Signaler "Event" (til "Event Handlers" i Perspectives / readmodel)
        
 ```
-Bemærk, at events kun distribueres inden for applikationen. Ingen events udløst initialiserings publiceres ud til eksterne lyttere!.
+Bemærk, at events kun distribueres inden for applikationen. Ingen events udløst af initialiseringseksvensen publiceres ud til eksterne lyttere!.
 
 ### Event Sourcing handlers og Aggregates
 
-Alle Event Sourcing handlers skal være indholdt i en klasse, der annoteres med @Aggregate - et eksempels ses her.
+Alle Event Sourcing handlers skal være indholdt i en klasse, der annoteres med @Aggregate - et eksempel ses her.
 ```
 @Aggregate(aggregateType = AggregateTypes.klient, repository = KlientWriteModelRepository.class)
 public class KlientAggregate  {
@@ -145,11 +145,11 @@ public class OpretKlientCommand extends Command {
     String efternavn;
 }
 ```
-Her beskriver '@TargetAggregateIdentifier' hvilken attribut i kommandoen, som bærer nøgleværdien for aggregatet, der opdateres.
+Her beskriver '@TargetAggregateIdentifier' hvilken attribut i kommandoen, som bærer nøgleværdien for aggregatet, der skal opdateres.
 
 ## Registering af Typer af Business Events ved initialisering
-Det er nødvendigt med noget bagvedliggende bogholderi i applikationen, for at holder styr på, hviklen event hanlder, der skal kaldes, når et business-events skal eksekveres.
-Først og fremmest - kom i hu, at et business-event er fast defineret således:
+Det er nødvendigt med noget bagvedliggende bogholderi i applikationen, for at holder styr på, hvilken eventhanlder, der skal kaldes, når et business-events skal eksekveres.
+Kom i hu, at et business-event er fast defineret således:
 
 ```
 public  class BusinessEvent<T>  implements ResolvableTypeProvider {
@@ -169,7 +169,7 @@ T object;
     }
 }
 ```
-Metode "getResovlableType" er en teknikalitet, der er tilstede, så det kan identficeres på runtime-tidspunktet, hvilken business-object,  der knyttet til forretnings-eventet.
+Metode "getResovlableType" er en teknikalitet, der er alene er tilstede, for at det kan identficeres på runtime-tidspunktet, hvilken business-object,  der knyttet til forretnings-eventet.
 Et business-object kan være defineret således:
 ```
 @BusinessObject(eventName = "klientOprettet_event")
@@ -179,7 +179,7 @@ public class KlientOprettetObject {
     String efternavn;
 }
 ```
-Bemærk her annotering @BusinessObject(eventName = "klientOprettet_event") - det er denne annotering, der gør det muligt for beskedmotoren,
+Bemærk her annoteringen @BusinessObject(eventName = "klientOprettet_event") - det er denne annotering, der gør det muligt for beskedmotoren,
 at skabe den rette informationsbærende klasse og forbinde den til et forretningsobject, når en besked modtages.
 
 Logikken bag dette er todelt - der sker noget ved initialisering af applikationen og noget, når en besked modtages.
@@ -205,7 +205,7 @@ Herefter vil beskedmotoren kalde alle event-handlers, der understøtter business
 
 ## Snapshotting
 Ud over, at persisteret BusinessEvent i Postgress-databasen, kan der også persisteres "Snapshots".
-Et snapshot er et øjebliksbillede af en instanse af et aggregat/en entititet. Et snapshot af samtlige 
+Et snapshot er et øjebliksbillede af en instans af et aggregat/en entititet. Et snapshot af samtlige 
 instanser i et aggregat kan foretages på anfording - og bør på sigt foretages periodisk.
 
 Snapshotting foretages for at optimerer indlæsningen af forretnings-events.
