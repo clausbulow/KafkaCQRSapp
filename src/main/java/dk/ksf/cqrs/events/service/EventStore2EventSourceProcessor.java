@@ -18,6 +18,8 @@ import java.util.*;
 @Component
 @Slf4j
 public class EventStore2EventSourceProcessor {
+    @Autowired
+    CqrsMetaInfo metaInfo;
 
     @Autowired
     ObjectMapper mapper;
@@ -27,8 +29,6 @@ public class EventStore2EventSourceProcessor {
     AggregateRepository aggregateRepository;
     @Autowired
     EventStoreRepository eventStoreRepository;
-    @Autowired
-    CqrsProperties props;
     @Autowired
     EventProcessor eventProcessor;
     @Autowired
@@ -76,7 +76,8 @@ public class EventStore2EventSourceProcessor {
     @EventListener
     @Order(10)
     public void initRepo(ContextRefreshedEvent event) {
-        props.getInitializeFromAggregates().forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> {
+        final Collection<AggregateTypes> initializeFromAggregates = metaInfo.getAggregatesSupportedInApplication();
+        initializeFromAggregates.forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> {
                     try {
                         BusinessEvent<?> businessEvent = eventProcessor.converToBusinessEvent(eventStoreItem);
                         dispatcher.publishEventToEventSourcing(businessEvent);

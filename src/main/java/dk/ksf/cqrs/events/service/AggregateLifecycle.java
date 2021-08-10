@@ -1,4 +1,4 @@
-package dk.ksf.application.writemodel;
+package dk.ksf.cqrs.events.service;
 
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.BusinessEvent;

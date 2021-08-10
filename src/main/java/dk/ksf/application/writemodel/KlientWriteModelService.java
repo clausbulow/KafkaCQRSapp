@@ -42,26 +42,6 @@ public class KlientWriteModelService {
     @Autowired
     EventStore2EventSourceProcessor eventStore2EventSourceProcessor;
 
-    public void retKlient(KlientRettetObject klient, long version) throws Exception{
-        KlientAggregate klientItem = klientRepository.findById(klient.getCpr()).orElse(new KlientAggregate());
- //       if (klientItem.getVersion()!= version-1){
- //           throw new InvalidDataVersionException("Kan ikke opdatere klient - versionsnummer er forket. Forventede "+Long.valueOf(klientItem.getVersion()+1)+", men modtog "+version);
- //       }
-        klientItem.setCpr(klient.getCpr());
-        klientItem.setEfternavn(klient.getEfternavn());
-        klientItem.setFornavn(klient.getFornavn());
-        klientItem.setVersion(version);
-        klientRepository.save(klientItem);
-    }
-
-    public void opretKlient(KlientOprettetObject klient, long version) throws Exception{
-        KlientAggregate klientItem = new KlientAggregate();
-        klientItem.setCpr(klient.getCpr());
-        klientItem.setEfternavn(klient.getEfternavn());
-        klientItem.setFornavn(klient.getFornavn());
-        klientItem.setVersion(version);
-        klientRepository.save(klientItem);
-    }
 
     public List <RetKlientDTO> getAllKlienter(){
         final List<RetKlientDTO> result = new ArrayList<>();
@@ -73,22 +53,13 @@ public class KlientWriteModelService {
         return eventStore2EventSourceProcessor.execute(AggregateTypes.klient);
     }
 
-    public Optional<RetKlientDTO> getKlient(String cpr) {
-        final Optional<KlientAggregate> optionalKlientItem = klientRepository.findById(cpr);
-        RetKlientDTO klient = null;
-        if (optionalKlientItem.isPresent()){
-            KlientAggregate klientItem = optionalKlientItem.get();
-            klient = RetKlientDTO.builder().cpr(klientItem.getCpr()).fornavn(klientItem.getFornavn()).efternavn(klientItem.getEfternavn()).version(klientItem.getVersion()).build();
-        }
-        return Optional.ofNullable(klient);
-    }
-
 
 
 
     @Transactional
     public CreateSnapshotsResponse createSnapshots() throws Exception{
         CreateSnapshotsResponse response = new CreateSnapshotsResponse();
+        //TDOD this can now get generlized by using metaInf read from Annotations
         Collection<KlientAggregate> allKlients = klientRepository.findAll();
         for (KlientAggregate klient: allKlients){
             AggregateItem aggregateItem = aggregateRepository.findByTypeAndKey(AggregateTypes.klient, klient.getCpr());

@@ -5,8 +5,8 @@ import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.model.BusinessEvent;
+import dk.ksf.cqrs.events.service.AggregateLifecycle;
 import dk.ksf.cqrs.events.service.CqrsMetaInfo;
-import dk.ksf.cqrs.events.service.EventService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import dk.ksf.application.writemodel.commands.*;
 import dk.ksf.application.common.eventobjects.*;
 
-@Component
 @Slf4j
 @NoArgsConstructor
 @Data
@@ -62,8 +61,6 @@ public class KlientAggregate  {
         log.info("Klient oprettet i writemodel");
     }
 
-
-
     @CommandHandler
     public void onRetKlientCommand(RetKlientCommand command) throws Exception{
         KlientRettetObject businessObject = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
@@ -76,6 +73,7 @@ public class KlientAggregate  {
                         key(command.getCpr()).
                         object(businessObject).
                         build();
+        //TODO - improve by calling aggregateLifecale from outside, in case hanlder is returning businessEvent/Collection of BusinessEvents
         aggregateLifecycle.apply(businessEvent);
     }
 

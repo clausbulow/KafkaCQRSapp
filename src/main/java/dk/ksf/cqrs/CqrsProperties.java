@@ -16,5 +16,4 @@ public class CqrsProperties {
     String topicNames;
     String eventobjectsPackage;
     String producingActorId;
-    List<AggregateTypes> initializeFromAggregates = new ArrayList<>();
 }

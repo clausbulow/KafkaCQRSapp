@@ -27,16 +27,6 @@ public class KlientWriteModelController {
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
 
-    @GetMapping("/klienter/{cpr}")
-    public ResponseEntity<?> processKlientGetKlientRequest(@PathVariable (name="cpr") String cpr, @RequestHeader("requestId") String requestId){
-        ResponseEntity<?> result;
-        final Optional<RetKlientDTO> klient = service.getKlient(cpr);
-        if (klient.isPresent()){
-            return ResponseEntity.accepted().body(klient.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @GetMapping("/klienter/eventstore")
     public ResponseEntity<List<JsonNode>> processGetEventstoreRequest(@RequestHeader("requestId") String requestId) {

@@ -2,6 +2,10 @@
 Denne applikation er en PoC. 
 Dens formål er at illustrere hvorledes CQRS og eventsourcing kan implementeres.
 
+Applikationen er inspireret af følgende artikler:
+1. [Playing with cqrs and eventsourcing...](https://blog.nebrass.fr/playing-with-cqrs-and-event-sourcing-in-spring-boot-and-axon/)
+2. [Building an Event Store](https://cqrs.wordpress.com/documents/building-event-storage/)
+
 Applicationen står ikke alene. Den eksistere i en kontekt hvor eksterne databaser, Kafka og Kafka connectors også er tilstede i systemlandskabet.
 
 Konteksten kan illustreres således:
