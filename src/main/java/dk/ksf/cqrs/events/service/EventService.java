@@ -31,16 +31,6 @@ public class EventService {
     @Autowired
     ObjectMapper mapper;
 
-    @Autowired
-    private ApplicationContext context;
-
-    @Autowired
-    CqrsProperties props;
-
-    private final Map<Class<?>, String> eventClassesToNames = new HashMap<>();
-    private final Map<String, Class<?>> eventNamesToClasses = new HashMap<>();
-
-
     public void fireEvent(BusinessEvent businessEvent) throws Exception {
         AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
         if (klientAggregateItem == null){
@@ -75,35 +65,5 @@ public class EventService {
         eventStoreRepository.save(eventStoreItem);
     }
 
-    @PostConstruct
-    public void initEventsList() throws Exception {
-        scanForBusinessObjects();
-    }
-
-    private void scanForBusinessObjects() throws Exception{
-        ClassPathScanningCandidateComponentProvider scanner;
-        scanner = new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
-        //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(props.getEventobjectsPackage());
-        for (BeanDefinition definition: candidateComponents){
-            System.out.println(definition.getBeanClassName());
-            Class clazz = Class.forName(definition.getBeanClassName());
-            //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
-            BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
-            String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
-            eventClassesToNames.put(clazz, eventName);
-            eventNamesToClasses.put(eventName,clazz);
-
-        }
-    }
-
-    public String getEventName(Class<?> clazz) {
-        return this.eventClassesToNames.get(clazz);
-    }
-
-    public Class<?> getEventClass (String eventName){
-        return this.eventNamesToClasses.get(eventName);
-    }
 
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Component
 public class KlientWriteModelRepository implements CrudRepository<KlientAggregate, String> {
-    private Map<String, KlientAggregate> klienter = new HashMap<>();
+    private final Map<String, KlientAggregate> klienter = new HashMap<>();
 
 
     @Override

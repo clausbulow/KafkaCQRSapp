@@ -4,6 +4,7 @@ import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.writemodel.KlientAggregate;
 import dk.ksf.application.writemodel.commands.OpretKlientCommand;
 import dk.ksf.application.writemodel.commands.RetKlientCommand;
+import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.model.BusinessEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class TestEventDispatcher {
         BusinessEvent<KlientOprettetObject> businessEvent =
                 BusinessEvent.<KlientOprettetObject>builder().
                         eventNavn("klient").
-                        aggregateType(KlientAggregate.this_aggregate_type).
+                        aggregateType(AggregateTypes.klient).
                         actor("KS").
                         key("020869-0214").
                         requestId("RequestID").

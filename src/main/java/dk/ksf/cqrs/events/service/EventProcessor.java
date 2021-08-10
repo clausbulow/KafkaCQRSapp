@@ -15,7 +15,7 @@ import java.util.Optional;
 @Slf4j
 public class EventProcessor  {
     @Autowired
-    EventService eventService;
+    CqrsMetaInfo metaInfo;
     @Autowired
     ObjectMapper mapper;
 
@@ -35,10 +35,10 @@ public class EventProcessor  {
         }
        // AggregateTypes aggregateType = AggregateTypes.valueOf(json.get("actor").asText());
         if (eventNavn != null) {
-            Class<?> eventClass = eventService.getEventClass(eventNavn);
+            Class<?> eventClass = metaInfo.getEventClass(eventNavn);
 
             final JsonNode event = json.get("object");
-                final Object eventObj = (Object) mapper.treeToValue((ObjectNode) event, eventClass);
+                final Object eventObj = mapper.treeToValue(event, eventClass);
                 BusinessEvent businessEvent =
                         BusinessEvent.builder().
                                 eventNavn(eventNavn).
@@ -50,7 +50,7 @@ public class EventProcessor  {
                                 build();
                 return businessEvent;
 
-        };
+        }
         return null;
     }
 }

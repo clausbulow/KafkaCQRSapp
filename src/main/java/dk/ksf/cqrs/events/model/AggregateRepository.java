@@ -10,9 +10,9 @@ import java.util.UUID;
 @Repository
 public interface AggregateRepository extends JpaRepository <AggregateItem,UUID> {
     @Query("select a from AggregateItem a where a.aggregatetype = ?1" )
-    public List<AggregateItem> findByTypeAndKey(AggregateTypes type);
+    List<AggregateItem> findByTypeAndKey(AggregateTypes type);
 
     @Query("select a from AggregateItem a where a.aggregatetype = ?1 and a.businesskey = ?2" )
-    public AggregateItem findByTypeAndKey(AggregateTypes type, String key);
+    AggregateItem findByTypeAndKey(AggregateTypes type, String key);
 
 }

@@ -5,7 +5,7 @@ public enum AggregateTypes {
     matrikel("matrikel");
 
     private final String name;
-    private AggregateTypes(String name){
+    AggregateTypes(String name){
         this.name = name;
     }
     public String toString() {

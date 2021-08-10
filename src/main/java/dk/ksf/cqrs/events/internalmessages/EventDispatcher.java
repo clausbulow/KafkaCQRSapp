@@ -2,6 +2,7 @@ package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.BusinessEvent;
+import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -35,6 +36,9 @@ public class EventDispatcher {
     @Autowired
     AutowireCapableBeanFactory beanFactory;
 
+    @Autowired
+    CqrsMetaInfo metaInfo;
+
 
     @PostConstruct
     public void initEventsList() throws Exception {
@@ -60,7 +64,6 @@ public class EventDispatcher {
                 if (perspectiveAnnotation != null){
                     processPerspective(clazz, clazzTypeInformation, perspectiveAnnotation);
                 }
-
             }
         }
     }
@@ -95,6 +98,7 @@ public class EventDispatcher {
     }
 
     private void proceessAggregate(Class clazz, ClassTypeInformation clazzTypeInformation, Aggregate aggregateAnnotation) {
+        metaInfo.registerAggregate(aggregateAnnotation.aggregateType(),clazz);
         AggregateInfo aggregateInfo = new AggregateInfo();
         aggregateInfo.setAggregateClass(clazz);
         aggregateInfo.setAggregateType(aggregateAnnotation.aggregateType());
@@ -213,7 +217,7 @@ public class EventDispatcher {
         } else {
             final Optional optionalAggregateItem = aggregateInfo.repository.findById(keyRefField.get(command));
             optionalAggregateItem.ifPresent(aggregateItem -> {
-                ReflectionUtils.invokeMethod((Method) method, aggregateItem, command);
+                ReflectionUtils.invokeMethod(method, aggregateItem, command);
                 aggregateInfo.repository.save(aggregateItem);
                 log.info("Aggregate updated");
             });

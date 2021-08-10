@@ -5,6 +5,7 @@ import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.model.BusinessEvent;
+import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,11 +17,10 @@ import dk.ksf.application.common.eventobjects.*;
 
 @Component
 @Slf4j
-@Aggregate(aggregateType = AggregateTypes.klient, repository = KlientWriteModelRepository.class)
 @NoArgsConstructor
 @Data
+@Aggregate(aggregateType = AggregateTypes.klient, repository = KlientWriteModelRepository.class)
 public class KlientAggregate  {
-    public static AggregateTypes this_aggregate_type = AggregateTypes.klient;
 
     @AggregateIdentifier
     String cpr;
@@ -32,20 +32,18 @@ public class KlientAggregate  {
     AggregateLifecycle aggregateLifecycle;
 
     @Autowired
-    EventService eventService;
+    CqrsMetaInfo metaInfo;
 
     @Autowired
     CqrsProperties props;
-
-
 
     @CommandHandler(createsAggregate = true)
     public void opretKlient(OpretKlientCommand command) throws Exception{
         KlientOprettetObject businessObject = KlientOprettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
         BusinessEvent<KlientOprettetObject> businessEvent =
                 BusinessEvent.<KlientOprettetObject>builder().
-                        eventNavn(eventService.getEventName(KlientOprettetObject.class)).
-                        aggregateType(KlientAggregate.this_aggregate_type).
+                        eventNavn(metaInfo.getEventName(KlientOprettetObject.class)).
+                        aggregateType(metaInfo.getAggregateType(this.getClass())).
                         actor(props.getProducingActorId()).
                         key(command.getCpr()).
                         requestId(command.getRequestId()).
@@ -71,8 +69,8 @@ public class KlientAggregate  {
         KlientRettetObject businessObject = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
         BusinessEvent businessEvent =
                 BusinessEvent.<KlientRettetObject>builder().
-                        eventNavn(eventService.getEventName(KlientRettetObject.class)).
-                        aggregateType(KlientAggregate.this_aggregate_type).
+                        eventNavn(metaInfo.getEventName(KlientRettetObject.class)).
+                        aggregateType(metaInfo.getAggregateType(this.getClass())).
                         actor(props.getProducingActorId()).
                         requestId(command.getRequestId()).
                         key(command.getCpr()).

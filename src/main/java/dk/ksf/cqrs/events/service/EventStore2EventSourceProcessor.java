@@ -56,7 +56,7 @@ public class EventStore2EventSourceProcessor {
         for (AggregateItem aggregateItem : klientAggregates) {
             final String key = aggregateItem.getBusinesskey();
             //Find the version of a snapshot applied for the instance (if any)...
-            final Long version = Optional.<Long>ofNullable(snapshotVersions.get(key)).orElse(Long.valueOf(-1));
+            final Long version = Optional.ofNullable(snapshotVersions.get(key)).orElse(Long.valueOf(-1));
             //And proceed producing events fram that version from the eventstore
             final List<EventStoreItem> events = eventStoreRepository.getEventStoreItemByAggregateIdAndVersion(aggregateType, key, version);
             events.stream().forEach(item -> {
