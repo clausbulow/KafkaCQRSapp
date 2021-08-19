@@ -1,5 +1,6 @@
 package dk.ksf.cqrs.events.service;
 
+import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.cqrs.events.service.EventService;
@@ -15,8 +16,8 @@ public class AggregateLifecycle {
     EventService eventService;
 
     @Transactional(transactionManager = "eventstoreTransactionManager")
-    public void apply(BusinessEvent<?> businessEvent) throws Exception {
-        eventDispatcher.publishEventToEventSourcing(businessEvent);
-        eventService.fireEvent(businessEvent);
+    public void apply(Object creator, CqrsContext context, Object businessEvent) throws Exception {
+        eventDispatcher.publishEventToEventSourcing(context,businessEvent);
+        eventService.fireEvent(creator, context,businessEvent);
     }
 }

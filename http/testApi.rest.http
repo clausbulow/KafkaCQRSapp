@@ -86,6 +86,51 @@ requestId: transI1
 }
 
 
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1426",
+  "fornavn": "Ellen",
+  "efternavn": "Munch"
+}
+
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1429",
+  "fornavn": "Jesper",
+  "efternavn": "XXX"
+}
+
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1431",
+  "fornavn": "Jesper",
+  "efternavn": "Skibby"
+}
+
+
+### Opret klient
+POST http://localhost:8081/commands/klient
+Content-Type: application/json
+requestId: transI1
+
+{
+  "cpr": "021165-1428",
+  "fornavn": "Dorthe",
+  "efternavn": "Holm"
+}
+
 
 ### Ret klient
 PUT http://localhost:8081/commands/klient/021165-1419
@@ -94,8 +139,8 @@ requestId: transI1
 
 {
   "cpr": "021165-1419",
-  "fornavn": "Jørgen",
-  "efternavn": "Dietrichseb",
+  "fornavn": "Jørgensen",
+  "efternavn": "Dietrichsen",
   "version": 13
 }
 

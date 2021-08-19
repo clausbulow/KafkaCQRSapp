@@ -1,5 +1,6 @@
 package dk.ksf.application.readmodel;
 
+import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.model.BusinessEvent;
@@ -66,17 +67,15 @@ public class KlientReadModelService {
     //Eventhandling...
     @EventHandler
     @Transactional
-    public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception {
-        KlientRettetObject klient = event.getObject();
-        retKlient(klient, event.getVersion());
+    public void onKlientRettetEvent(CqrsContext context, KlientRettetObject event) throws Exception {
+        retKlient(event, context.getVersion());
         log.info("Klient rettet i read-model");
     }
 
     @EventHandler
     @Transactional
-    public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception {
-        KlientOprettetObject klient = event.getObject();
-        opretKlient(klient, event.getVersion());
+    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception {
+        opretKlient(event, context.getVersion());
         log.info("Klient oprettet i read-model");
     }
 

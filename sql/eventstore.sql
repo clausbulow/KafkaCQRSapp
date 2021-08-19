@@ -35,6 +35,10 @@ create table inventory.snapshots (
   data text
 );
 
+delete from inventory.aggregates;
+delete from inventory.eventstore;
+delete from inventory.snapshots;
+
 select * from inventory.aggregates;
 
 select * from inventory.eventstore;

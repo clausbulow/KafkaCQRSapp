@@ -2,6 +2,7 @@
 package dk.ksf.application.writemodel;
 
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.model.BusinessEvent;
@@ -30,60 +31,37 @@ public class KlientAggregate  {
     @Autowired
     AggregateLifecycle aggregateLifecycle;
 
-    @Autowired
-    CqrsMetaInfo metaInfo;
-
-    @Autowired
-    CqrsProperties props;
-
     @CommandHandler(createsAggregate = true)
-    public void opretKlient(OpretKlientCommand command) throws Exception{
-        KlientOprettetObject businessObject = KlientOprettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
-        BusinessEvent<KlientOprettetObject> businessEvent =
-                BusinessEvent.<KlientOprettetObject>builder().
-                        eventNavn(metaInfo.getEventName(KlientOprettetObject.class)).
-                        aggregateType(metaInfo.getAggregateType(this.getClass())).
-                        actor(props.getProducingActorId()).
-                        key(command.getCpr()).
-                        requestId(command.getRequestId()).
-                        object(businessObject).
-                        build();
-        aggregateLifecycle.apply(businessEvent);
+    public KlientOprettetObject opretKlient(CqrsContext context, OpretKlientCommand command) throws Exception{
+        KlientOprettetObject businessObject = KlientOprettetObject.builder().
+                cpr(command.getCpr()).
+                efternavn(command.getEfternavn()).
+                fornavn(command.getFornavn()).
+                build();
+        return businessObject;
     }
 
     @EventSourcingHandler
-    public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception{
-        KlientOprettetObject klient = event.getObject();
-        fornavn = klient.getFornavn();
-        efternavn = klient.getEfternavn();
-        cpr = klient.getCpr();
-        version = event.getVersion();
+    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception{
+        fornavn = event.getFornavn();
+        efternavn = event.getEfternavn();
+        cpr = event.getCpr();
+        version = context.getVersion();
         log.info("Klient oprettet i writemodel");
     }
 
     @CommandHandler
-    public void onRetKlientCommand(RetKlientCommand command) throws Exception{
-        KlientRettetObject businessObject = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
-        BusinessEvent businessEvent =
-                BusinessEvent.<KlientRettetObject>builder().
-                        eventNavn(metaInfo.getEventName(KlientRettetObject.class)).
-                        aggregateType(metaInfo.getAggregateType(this.getClass())).
-                        actor(props.getProducingActorId()).
-                        requestId(command.getRequestId()).
-                        key(command.getCpr()).
-                        object(businessObject).
-                        build();
-        //TODO - improve by calling aggregateLifecale from outside, in case hanlder is returning businessEvent/Collection of BusinessEvents
-        aggregateLifecycle.apply(businessEvent);
+    public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand command) throws Exception{
+        KlientRettetObject businessEvent = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
+        return businessEvent;
     }
 
     @EventSourcingHandler
-    public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
-        KlientRettetObject klient = event.getObject();
-        fornavn = klient.getFornavn();
-        efternavn = klient.getEfternavn();
-        cpr = klient.getCpr();
-        version = event.getVersion();
+    public void onKlientRettetEvent(CqrsContext context,KlientRettetObject event) throws Exception{
+        fornavn = event.getFornavn();
+        efternavn = event.getEfternavn();
+        cpr = event.getCpr();
+        version = context.getVersion();
         log.info("Klient rettet i writemodel");
     }
 }

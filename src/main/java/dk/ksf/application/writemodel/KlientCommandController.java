@@ -3,6 +3,7 @@ package dk.ksf.application.writemodel;
 import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.application.writemodel.commands.OpretKlientCommand;
 import dk.ksf.application.writemodel.commands.RetKlientCommand;
+import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,8 @@ public class KlientCommandController {
                 fornavn(retKlientDTO.getFornavn()).
                 efternavn(retKlientDTO.getEfternavn()).
                 build();
-        opretKlientCommand.setVersion(retKlientDTO.getVersion());
-        opretKlientCommand.setRequestId(requestId);
-        eventDispatcher.publishCommand(opretKlientCommand);
+        eventDispatcher.publishCommand(CqrsContext.builder().requestId(requestId).version(retKlientDTO.getVersion()).build(),
+                opretKlientCommand);
         return ResponseEntity.accepted().build();
     }
 
@@ -36,9 +36,8 @@ public class KlientCommandController {
                 efternavn(retKlientDTO.getEfternavn()).
                 cpr(cpr).
                 build();
-        retKlientCommand.setVersion(retKlientDTO.getVersion());
-        retKlientCommand.setRequestId(requestId);
-        eventDispatcher.publishCommand(retKlientCommand);
+        eventDispatcher.publishCommand(CqrsContext.builder().requestId(requestId).version(retKlientDTO.getVersion()).build(),
+                retKlientCommand);
         return ResponseEntity.accepted().build();
     }
 

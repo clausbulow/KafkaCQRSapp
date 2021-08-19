@@ -15,6 +15,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,6 @@ import java.util.Set;
 
 @Service
 public class CqrsMetaInfo {
-    @Autowired
     CqrsProperties props;
 
     private final Map<Class<?>, String> eventClassesToNames = new HashMap<>();
@@ -31,6 +31,14 @@ public class CqrsMetaInfo {
 
     private final Map<Class<?>, AggregateTypes> aggregateClassesToAggregateType = new HashMap<>();
     private final Map<AggregateTypes, Class<?>> aggregateTypeToClass = new HashMap<>();
+
+    private final Map<Class<?>, Field> aggregateIdentfierFieldsToClass = new HashMap<>();
+
+    private final Map<Class<?>, Field> classToKeyField = new HashMap<>();
+
+    public CqrsMetaInfo (CqrsProperties props){
+        this.props = props;
+    }
 
 
     public String getEventName(Class<?> klientOprettetObjectClass) {
@@ -74,5 +82,21 @@ public class CqrsMetaInfo {
 
     public AggregateTypes getAggregateType(Class<?> aClass) {
         return this.aggregateClassesToAggregateType.get(aClass);
+    }
+
+    public void registerKeyField(Class containerClass, Field field) {
+        classToKeyField.put(containerClass,field);
+    }
+    public Field getKeyField(Class containerClass) {
+        return classToKeyField.get(containerClass);
+    }
+
+    public void registerAggrateIdentifer(Class parameterType, Field field) {
+        if (!this.aggregateIdentfierFieldsToClass.containsKey(parameterType)){
+            this.aggregateIdentfierFieldsToClass.put(parameterType, field);
+        }
+    }
+    public Field getAggregateIdentifierFromClass(Class clazz){
+        return this.aggregateIdentfierFieldsToClass.get(clazz);
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.internalmessages.AllCqrsAnnotationsHandler;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,9 @@ public class EventStore2EventSourceProcessor {
     EventProcessor eventProcessor;
     @Autowired
     EventDispatcher dispatcher;
+
+    @Autowired
+    AllCqrsAnnotationsHandler cqrsAnnotationsHandler;
 
     public List<JsonNode> execute(AggregateTypes aggregateType) {
         final List<JsonNode> result = new ArrayList<>();
@@ -75,13 +80,15 @@ public class EventStore2EventSourceProcessor {
     //Executes on application initialization
     @EventListener
     @Order(10)
-    public void initRepo(ContextRefreshedEvent event) {
+    public void initRepo(ContextRefreshedEvent event) throws Exception {
+        cqrsAnnotationsHandler.initEventsList();
+
         final Collection<AggregateTypes> initializeFromAggregates = metaInfo.getAggregatesSupportedInApplication();
         initializeFromAggregates.forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> {
                     try {
-                        BusinessEvent<?> businessEvent = eventProcessor.converToBusinessEvent(eventStoreItem);
-                        dispatcher.publishEventToEventSourcing(businessEvent);
-                        dispatcher.publishEventToEventHandlers(businessEvent);
+                        ConvertToBusinessEventResponse eventWithContext = eventProcessor.converToBusinessEvent(eventStoreItem);
+                        dispatcher.publishEventToEventSourcing(eventWithContext.getContext(),eventWithContext.getBusinessEvent());
+                        dispatcher.publishEventToEventHandlers(eventWithContext.getContext(),eventWithContext.getBusinessEvent());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -2,6 +2,8 @@ package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.BusinessEventFactory;
+import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.BusinessObject;
 import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.cqrs.events.model.*;
@@ -29,9 +31,13 @@ public class EventService {
     AggregateRepository aggregateRepository;
 
     @Autowired
+    BusinessEventFactory beFactory;
+
+    @Autowired
     ObjectMapper mapper;
 
-    public void fireEvent(BusinessEvent businessEvent) throws Exception {
+    public void fireEvent(Object creator, CqrsContext context, Object event) throws Exception {
+        BusinessEvent<?> businessEvent = beFactory.createBusinessEvent(creator, context, event);
         AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
         if (klientAggregateItem == null){
             klientAggregateItem = new AggregateItem();
