@@ -1,4 +1,4 @@
-package dk.ksf.cqrs.events.internalmessages;
+package dk.ksf.cqrs.exceptions;
 
 public class MessageException extends Exception {
     public MessageException(){

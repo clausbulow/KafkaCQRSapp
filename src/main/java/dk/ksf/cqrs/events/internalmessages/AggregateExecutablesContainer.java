@@ -2,29 +2,24 @@ package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
-import dk.ksf.cqrs.events.model.BusinessEvent;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.Repository;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 
 @Slf4j
-public class AggregateHandlerContainer extends HandlerContainer {
+public class AggregateExecutablesContainer extends AbstractExecutablesContainer {
     private final AutowireCapableBeanFactory beanFactory;
     private final Aggregate annotation;
     private final CqrsMetaInfo metaInfo;
     private Field keyField;
     private CrudRepository repository;
 
-    public AggregateHandlerContainer(Aggregate aggregateAnnotation, Class aggregateClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
+    public AggregateExecutablesContainer(Aggregate aggregateAnnotation, Class aggregateClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
         super(aggregateClass, beanFactory, metaInfo, eventService);
         this.beanFactory = beanFactory;
         this.annotation = aggregateAnnotation;

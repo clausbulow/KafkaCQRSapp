@@ -3,8 +3,6 @@ package dk.ksf.cqrs.events.internalmessages;
 import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
-import dk.ksf.cqrs.events.model.BusinessEvent;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.*;
 import org.junit.Assert;
@@ -21,7 +19,7 @@ import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AggregateCrqsAnnotationHandlerTest {
-    AggregateHandlerContainer aggregateCrqsAnnotationHandler;
+    AggregateExecutablesContainer aggregateCrqsAnnotationHandler;
 
     @Mock
     AutowireCapableBeanFactory factory;
@@ -49,7 +47,7 @@ public class AggregateCrqsAnnotationHandlerTest {
         Mockito.when(factory.getBean(TestRepository.class)).thenReturn(repository);
         annotation = AnnotationUtils.findAnnotation(TestKlientAggregate.class, Aggregate.class);
 
-        aggregateCrqsAnnotationHandler = new AggregateHandlerContainer(annotation, TestKlientAggregate.class, factory, metaInfo, eventService);
+        aggregateCrqsAnnotationHandler = new AggregateExecutablesContainer(annotation, TestKlientAggregate.class, factory, metaInfo, eventService);
         aggregateCrqsAnnotationHandler.scanForAnnotations();
     }
 

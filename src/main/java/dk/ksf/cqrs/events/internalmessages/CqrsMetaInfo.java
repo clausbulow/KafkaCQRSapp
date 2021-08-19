@@ -1,4 +1,4 @@
-package dk.ksf.cqrs.events.service;
+package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.writemodel.KlientAggregate;

@@ -2,10 +2,9 @@ package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

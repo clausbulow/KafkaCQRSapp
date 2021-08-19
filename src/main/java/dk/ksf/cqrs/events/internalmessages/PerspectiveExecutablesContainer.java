@@ -2,25 +2,24 @@ package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
+import dk.ksf.cqrs.exceptions.MessageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-public class PerspectiveHandlerContainer extends HandlerContainer{
+public class PerspectiveExecutablesContainer extends AbstractExecutablesContainer {
     private final AutowireCapableBeanFactory beanFactory;
     private final Perspective annotation;
     private Field keyField;
     private CrudRepository repository;
 
-    public PerspectiveHandlerContainer(Perspective annotation, Class aggregateClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
+    public PerspectiveExecutablesContainer(Perspective annotation, Class aggregateClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
         super(aggregateClass, beanFactory, metaInfo, eventService);
         this.beanFactory = beanFactory;
         this.annotation = annotation;

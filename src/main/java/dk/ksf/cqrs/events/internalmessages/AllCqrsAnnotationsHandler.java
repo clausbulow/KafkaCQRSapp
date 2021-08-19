@@ -2,18 +2,14 @@ package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
-import dk.ksf.cqrs.events.model.BusinessEvent;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +30,7 @@ public class AllCqrsAnnotationsHandler {
     private List<Class> classAnnotationsOfInterest = Arrays.asList(
             Aggregate.class, Perspective.class
     );
-    List<HandlerContainer> handlerContainers = new ArrayList<>();
+    List<AbstractExecutablesContainer> abstractExecutablesContainers = new ArrayList<>();
 
     public void scanForClassAnnotation(String  basePackage) throws Exception {
         final ClassPathScanningCandidateComponentProvider scanner;
@@ -52,7 +48,7 @@ public class AllCqrsAnnotationsHandler {
     }
 
     public void scanHandlerContainersForHandlers() throws Exception {
-        handlerContainers.forEach(handlerContainer -> {
+        abstractExecutablesContainers.forEach(handlerContainer -> {
             try {
                 handlerContainer.scanForAnnotations();
             } catch (Exception e) {
@@ -64,21 +60,21 @@ public class AllCqrsAnnotationsHandler {
     public void scanClassForHandlerContainers(final Class clazz) {
         final Aggregate aggregateAnnotation = (Aggregate) clazz.getAnnotation(Aggregate.class);
         if (aggregateAnnotation != null){
-            handlerContainers.add(new AggregateHandlerContainer(aggregateAnnotation, clazz, factory, metaInfo, eventService));
+            abstractExecutablesContainers.add(new AggregateExecutablesContainer(aggregateAnnotation, clazz, factory, metaInfo, eventService));
         } else {
             final Perspective perspectiveAnnotation = (Perspective)  clazz.getAnnotation(Perspective.class);
             if (perspectiveAnnotation != null){
-                handlerContainers.add(new PerspectiveHandlerContainer(perspectiveAnnotation, clazz,factory, metaInfo, eventService));
+                abstractExecutablesContainers.add(new PerspectiveExecutablesContainer(perspectiveAnnotation, clazz,factory, metaInfo, eventService));
             }
         }
     }
 
     public List getHandlerContainers() {
-        return handlerContainers;
+        return abstractExecutablesContainers;
     }
 
     public void signalEventHandlers (CqrsContext context, Object event) throws Exception{
-        handlerContainers.forEach(container -> {
+        abstractExecutablesContainers.forEach(container -> {
             try {
                 container.signalEventHandlers(context, event);
             } catch (Exception e) {
@@ -88,7 +84,7 @@ public class AllCqrsAnnotationsHandler {
     }
 
     public void signalEventSourcingHandlers (CqrsContext context, Object event) throws Exception{
-        handlerContainers.forEach(container -> {
+        abstractExecutablesContainers.forEach(container -> {
             try {
                 container.signalEventSourcingHandlers(context, event);
             } catch (Exception e) {
@@ -98,7 +94,7 @@ public class AllCqrsAnnotationsHandler {
     }
 
     public void signalCommandHandlers (CqrsContext context, Object command) throws Exception{
-        handlerContainers.forEach(container -> {
+        abstractExecutablesContainers.forEach(container -> {
             try {
                 container.signalCommandHandlers(context,command);
             } catch (Exception e) {

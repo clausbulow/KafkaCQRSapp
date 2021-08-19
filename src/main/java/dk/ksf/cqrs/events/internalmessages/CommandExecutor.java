@@ -1,10 +1,8 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.TargetAggregateIdentifier;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -14,12 +12,12 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class CommandHandlerExecutor extends HandlerExecutor {
+public class CommandExecutor extends AbstractExecutor {
     private final CrudRepository repository;
     private final boolean createsAggregate;
     private  Field targetAggregateIdentifier = null;
 
-    public CommandHandlerExecutor(HandlerContainer owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
+    public CommandExecutor(AbstractExecutablesContainer owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
         super(owner, method,supportsType, factory);
         Aggregate classAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Aggregate.class);
         repository = factory.getBean(classAnnotation.repository());

@@ -4,8 +4,6 @@ import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
-import dk.ksf.cqrs.events.model.BusinessEvent;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -14,12 +12,11 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 
 @Slf4j
-public abstract class HandlerContainer {
+public abstract class AbstractExecutablesContainer {
     private final AutowireCapableBeanFactory beanFactory;
     private final CqrsMetaInfo metaInfo;
     private final EventService eventService;
@@ -27,17 +24,17 @@ public abstract class HandlerContainer {
     public abstract List<Class> memberAnnotationsOfInterest();
 
 
-    private final Map<Class, List<HandlerExecutor>> handlerExecutors = new HashMap<>();
+    private final Map<Class, List<AbstractExecutor>> handlerExecutors = new HashMap<>();
 
     private Class containerClass;
 
-    private HandlerExectutorFactory handlerExectutorFactory;
+    private ExectutorFactory exectutorFactory;
 
-    public HandlerContainer(Class containerClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
+    public AbstractExecutablesContainer(Class containerClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
         this.containerClass = containerClass;
         this.beanFactory = beanFactory;
         this.metaInfo = metaInfo;
-        this.handlerExectutorFactory = new HandlerExectutorFactory(metaInfo);
+        this.exectutorFactory = new ExectutorFactory(metaInfo);
         this.eventService = eventService;
 
     }
@@ -66,40 +63,40 @@ public abstract class HandlerContainer {
     private void createHandlerExecutor(Method method, Annotation annotation, Class annotationClass, AutowireCapableBeanFactory factory) throws Exception {
         //Assert that BusinessEvent and command handler is last param
         ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount()-1);
-        HandlerExecutor handlerExecutor = handlerExectutorFactory.createHandlerExecutor(HandlerFactoryParams.builder().
+        AbstractExecutor abstractExecutor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
                 method(method).
                 targetType(targetType).
                 annotationClass(annotationClass).
                 factory(factory).
                 owner(this).
                 annotation(annotation).build());
-        List<HandlerExecutor> executors;
+        List<AbstractExecutor> executors;
         if (!handlerExecutors.containsKey(annotationClass)) {
             executors = new ArrayList<>();
             handlerExecutors.put(annotationClass, executors);
         } else {
             executors = handlerExecutors.get(annotationClass);
         }
-        executors.add(handlerExecutor);
+        executors.add(abstractExecutor);
     }
 
 
 
-    public List<HandlerExecutor> getEventSourcingHandlerExecutors() {
+    public List<AbstractExecutor> getEventSourcingHandlerExecutors() {
         if (handlerExecutors.containsKey(EventSourcingHandler.class)) {
             return handlerExecutors.get(EventSourcingHandler.class);
         }
         return new ArrayList<>();
     }
 
-    public List<HandlerExecutor> getEventHandlerExecutors() {
+    public List<AbstractExecutor> getEventHandlerExecutors() {
         if (handlerExecutors.containsKey(EventHandler.class)) {
             return handlerExecutors.get(EventHandler.class);
         }
         return new ArrayList<>();
     }
 
-    public List<HandlerExecutor> getCommandHandlerExecutors() {
+    public List<AbstractExecutor> getCommandHandlerExecutors() {
         if (handlerExecutors.containsKey(CommandHandler.class)) {
             return handlerExecutors.get(CommandHandler.class);
         }
@@ -108,9 +105,9 @@ public abstract class HandlerContainer {
 
 
     public void signalCommandHandlers(CqrsContext context, Object command) throws Exception {
-        List<HandlerExecutor> commandHandlerExecutors = getCommandHandlerExecutors();
+        List<AbstractExecutor> commandAbstractExecutors = getCommandHandlerExecutors();
         context.setKey((String)metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
-        commandHandlerExecutors.forEach(executor -> {
+        commandAbstractExecutors.forEach(executor -> {
             if (!executor.supports(command)){
                 return;
             }
@@ -163,9 +160,9 @@ public abstract class HandlerContainer {
 
 
     public void signalEventHandlers(CqrsContext context, Object event) throws Exception {
-        List<HandlerExecutor> eventHandlerExecutors = getEventHandlerExecutors();
+        List<AbstractExecutor> eventAbstractExecutors = getEventHandlerExecutors();
         context.setTargetInstance(beanFactory.getBean(this.containerClass));
-        eventHandlerExecutors.forEach(executor -> {
+        eventAbstractExecutors.forEach(executor -> {
             try {
                 executor.execute(context, event);
             } catch (Exception e) {
@@ -174,10 +171,10 @@ public abstract class HandlerContainer {
     }
 
     public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception {
-        List<HandlerExecutor> eventHandlerExecutors = getEventSourcingHandlerExecutors();
+        List<AbstractExecutor> eventAbstractExecutors = getEventSourcingHandlerExecutors();
         context.setKey((String)metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
 
-        eventHandlerExecutors.forEach(executor -> {
+        eventAbstractExecutors.forEach(executor -> {
             try {
                 if (!executor.supports(event)){
                     return;

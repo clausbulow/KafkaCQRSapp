@@ -1,18 +1,14 @@
 //inspired by https://blog.nebrass.fr/playing-with-cqrs-and-event-sourcing-in-spring-boot-and-axon/
 package dk.ksf.application.writemodel;
 
-import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.AggregateTypes;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.cqrs.events.service.AggregateLifecycle;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import dk.ksf.application.writemodel.commands.*;
 import dk.ksf.application.common.eventobjects.*;
 

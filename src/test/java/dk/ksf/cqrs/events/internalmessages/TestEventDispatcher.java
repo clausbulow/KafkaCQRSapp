@@ -13,7 +13,6 @@ import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
 import dk.ksf.cqrs.events.model.AggregateTypes;
-import dk.ksf.cqrs.events.service.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -25,7 +24,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 

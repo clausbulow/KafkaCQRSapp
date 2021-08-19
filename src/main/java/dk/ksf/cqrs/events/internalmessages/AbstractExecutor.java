@@ -11,14 +11,14 @@ import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public abstract class HandlerExecutor {
+public abstract class AbstractExecutor {
 
     private Object owner;
     private final ResolvableType supportsType;
     private final Method method;
     private final AutowireCapableBeanFactory factory;
 
-    public HandlerExecutor (Object owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory){
+    public AbstractExecutor(Object owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory){
         this.owner = owner;
         this.method = method;
         this.supportsType = supportsType;
