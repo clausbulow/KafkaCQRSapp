@@ -37,8 +37,7 @@ public class ReadModelDatasourceConfig {
     @Primary
     @Bean("readstoreDatasource")
     public DataSource readDataSource(@Qualifier("readstoreProps") DataSourceProperties dataSourceProperties) {
-        HikariDataSource datasource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-        return datasource;
+        return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
 

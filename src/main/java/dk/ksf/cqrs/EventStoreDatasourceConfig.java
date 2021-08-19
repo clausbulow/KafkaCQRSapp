@@ -35,8 +35,7 @@ public class EventStoreDatasourceConfig {
 
     @Bean("eventstoreDatasource")
     public DataSource readDataSource(@Qualifier("eventstoreProps") DataSourceProperties dataSourceProperties) {
-        HikariDataSource datasource = dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-        return datasource;
+        return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
     @Bean("eventstoreTransactionManager")

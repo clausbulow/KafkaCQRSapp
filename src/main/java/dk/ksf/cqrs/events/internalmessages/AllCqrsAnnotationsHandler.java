@@ -27,10 +27,10 @@ public class AllCqrsAnnotationsHandler {
         this.metaInfo = metaInfo;
         this.eventService = eventService;
     }
-    private List<Class> classAnnotationsOfInterest = Arrays.asList(
+    private final List<Class> classAnnotationsOfInterest = Arrays.asList(
             Aggregate.class, Perspective.class
     );
-    List<AbstractExecutablesContainer> abstractExecutablesContainers = new ArrayList<>();
+    final List<AbstractExecutablesContainer> abstractExecutablesContainers = new ArrayList<>();
 
     public void scanForClassAnnotation(String  basePackage) throws Exception {
         final ClassPathScanningCandidateComponentProvider scanner;

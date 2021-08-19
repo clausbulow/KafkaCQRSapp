@@ -1,7 +1,6 @@
 package dk.ksf.cqrs.kafka;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.service.ConvertToBusinessEventResponse;
 import dk.ksf.cqrs.events.service.EventProcessor;

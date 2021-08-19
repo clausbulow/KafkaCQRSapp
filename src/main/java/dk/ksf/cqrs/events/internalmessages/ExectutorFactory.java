@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ExectutorFactory {
-    CqrsMetaInfo metaInfo;
+    final CqrsMetaInfo metaInfo;
 
     public ExectutorFactory(CqrsMetaInfo metaInfo) {
         this.metaInfo = metaInfo;

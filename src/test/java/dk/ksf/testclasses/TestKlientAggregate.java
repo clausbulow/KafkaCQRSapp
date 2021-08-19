@@ -1,10 +1,8 @@
 package dk.ksf.testclasses;
 
-import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.model.AggregateTypes;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import lombok.Data;
 
 @Data

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TestRepository implements CrudRepository<TestKlientAggregate, String> {
-    Map<String, TestKlientAggregate>  data = new HashMap<> ();
+    final Map<String, TestKlientAggregate>  data = new HashMap<> ();
 
     @Override
     public <S extends TestKlientAggregate> S save(S s) {

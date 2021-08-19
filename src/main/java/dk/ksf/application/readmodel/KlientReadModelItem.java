@@ -1,6 +1,5 @@
 package dk.ksf.application.readmodel;
 
-import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.Data;

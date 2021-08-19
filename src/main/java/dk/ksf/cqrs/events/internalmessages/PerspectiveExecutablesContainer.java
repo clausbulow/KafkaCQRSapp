@@ -15,20 +15,18 @@ import java.util.List;
 @Slf4j
 public class PerspectiveExecutablesContainer extends AbstractExecutablesContainer {
     private final AutowireCapableBeanFactory beanFactory;
-    private final Perspective annotation;
     private Field keyField;
     private CrudRepository repository;
 
     public PerspectiveExecutablesContainer(Perspective annotation, Class aggregateClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
         super(aggregateClass, beanFactory, metaInfo, eventService);
         this.beanFactory = beanFactory;
-        this.annotation = annotation;
     }
 
 
     @Override
     public List<Class> memberAnnotationsOfInterest() {
-        return Arrays.asList(EventHandler.class);
+        return List.of(EventHandler.class);
     }
 
     @Override

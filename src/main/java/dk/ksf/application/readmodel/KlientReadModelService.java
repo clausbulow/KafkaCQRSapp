@@ -3,7 +3,6 @@ package dk.ksf.application.readmodel;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.Perspective;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.common.eventobjects.KlientRettetObject;

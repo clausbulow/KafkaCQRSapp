@@ -13,14 +13,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class CommandExecutor extends AbstractExecutor {
-    private final CrudRepository repository;
     private final boolean createsAggregate;
     private  Field targetAggregateIdentifier = null;
 
     public CommandExecutor(AbstractExecutablesContainer owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
         super(owner, method,supportsType, factory);
         Aggregate classAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Aggregate.class);
-        repository = factory.getBean(classAnnotation.repository());
+        CrudRepository repository = factory.getBean(classAnnotation.repository());
         CommandHandler handlerAnnotation = AnnotationUtils.findAnnotation(method, CommandHandler.class);
         createsAggregate = handlerAnnotation.createsAggregate();
         //Parameter parameter = method.getParameters()[0];

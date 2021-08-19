@@ -29,12 +29,11 @@ public class KlientAggregate  {
 
     @CommandHandler(createsAggregate = true)
     public KlientOprettetObject opretKlient(CqrsContext context, OpretKlientCommand command) throws Exception{
-        KlientOprettetObject businessObject = KlientOprettetObject.builder().
+        return KlientOprettetObject.builder().
                 cpr(command.getCpr()).
                 efternavn(command.getEfternavn()).
                 fornavn(command.getFornavn()).
                 build();
-        return businessObject;
     }
 
     @EventSourcingHandler
@@ -48,8 +47,7 @@ public class KlientAggregate  {
 
     @CommandHandler
     public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand command) throws Exception{
-        KlientRettetObject businessEvent = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
-        return businessEvent;
+        return KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
     }
 
     @EventSourcingHandler

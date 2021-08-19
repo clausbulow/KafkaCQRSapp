@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 
 public class EventSourcingExecutor extends AbstractExecutor {
     private  Field aggregateIdentifier;
-    public CrudRepository repository;
+    public final CrudRepository repository;
     public EventSourcingExecutor(Object owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
         super(owner,method, supportsType,factory);
         Aggregate classAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Aggregate.class);

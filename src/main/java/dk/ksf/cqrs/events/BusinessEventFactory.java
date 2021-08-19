@@ -26,7 +26,7 @@ public class BusinessEventFactory {
         Field keyField = metaInfo.getKeyField(creator.getClass());
         keyField.get(creator);
 
-        BusinessEvent<T> result = BusinessEvent.<T>builder().
+        return BusinessEvent.<T>builder().
                 eventNavn(metaInfo.getEventName(businessObject.getClass())).
                 actor(props.getProducingActorId()).
                 key((String) keyField.get(creator)).
@@ -35,7 +35,6 @@ public class BusinessEventFactory {
                 created_at(Instant.now()).
                 object(businessObject).
                 build();
-        return result;
     }
 
 }

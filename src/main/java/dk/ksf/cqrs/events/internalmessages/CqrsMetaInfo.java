@@ -1,13 +1,8 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.application.common.eventobjects.KlientOprettetObject;
-import dk.ksf.application.writemodel.KlientAggregate;
 import dk.ksf.cqrs.CqrsProperties;
-import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.BusinessObject;
 import dk.ksf.cqrs.events.model.AggregateTypes;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -24,7 +19,7 @@ import java.util.Set;
 
 @Service
 public class CqrsMetaInfo {
-    CqrsProperties props;
+    final CqrsProperties props;
 
     private final Map<Class<?>, String> eventClassesToNames = new HashMap<>();
     private final Map<String, Class<?>> eventNamesToClasses = new HashMap<>();

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TestKlientAggregateRepository implements CrudRepository<TestEventDispatcher, String> {
-    Map<String, TestEventDispatcher>  data = new HashMap<> ();
+    final Map<String, TestEventDispatcher>  data = new HashMap<> ();
 
     @Override
     public <S extends TestEventDispatcher> S save(S s) {

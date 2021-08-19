@@ -21,7 +21,7 @@ public class KlientWriteModelRepository implements CrudRepository<KlientAggregat
 
     @Override
     public <S extends KlientAggregate> Iterable<S> saveAll(Iterable<S> iterable) {
-        iterable.forEach(klient -> save(klient));
+        iterable.forEach(this::save);
         return iterable;
     }
 
@@ -63,7 +63,7 @@ public class KlientWriteModelRepository implements CrudRepository<KlientAggregat
 
     @Override
     public void deleteAllById(Iterable<? extends String> iterable) {
-        iterable.forEach(id -> klienter.remove(id));
+        iterable.forEach(klienter::remove);
 
     }
 

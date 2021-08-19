@@ -1,22 +1,12 @@
 package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.BusinessEventFactory;
 import dk.ksf.cqrs.events.CqrsContext;
-import dk.ksf.cqrs.events.annotations.BusinessObject;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import dk.ksf.cqrs.events.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.*;

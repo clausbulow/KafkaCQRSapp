@@ -26,9 +26,9 @@ public abstract class AbstractExecutablesContainer {
 
     private final Map<Class, List<AbstractExecutor>> handlerExecutors = new HashMap<>();
 
-    private Class containerClass;
+    private final Class containerClass;
 
-    private ExectutorFactory exectutorFactory;
+    private final ExectutorFactory exectutorFactory;
 
     public AbstractExecutablesContainer(Class containerClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
         this.containerClass = containerClass;

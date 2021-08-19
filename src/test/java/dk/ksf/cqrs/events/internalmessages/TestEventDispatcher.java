@@ -46,18 +46,13 @@ public class TestEventDispatcher {
     EventService eventService;
 
 
-    static TestKlientAggregateRepository repository = new TestKlientAggregateRepository();
+    static final TestKlientAggregateRepository repository = new TestKlientAggregateRepository();
 
     @AggregateIdentifier
     String id;
     String fornavn;
     String efternavn;
 
-
-    @BeforeClass
-    public static void beforeClass() throws Exception{
-
-    }
 
     @Before
     public void before() throws Exception {

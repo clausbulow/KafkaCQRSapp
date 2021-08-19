@@ -32,10 +32,10 @@ public class AggregateCrqsAnnotationHandlerTest {
     @Mock
     EventService eventService;
 
-    TestRepository repository = new TestRepository();
+    final TestRepository repository = new TestRepository();
     private Object AllCqrsAnnotationsHandler;
 
-    private TestKlientAggregate target  = new TestKlientAggregate();
+    private final TestKlientAggregate target  = new TestKlientAggregate();
 
     @Before
     public void before() throws Exception {
