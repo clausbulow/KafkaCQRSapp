@@ -1,28 +1,29 @@
-package dk.ksf.application.writemodel;
+package dk.ksf.testclasses;
 
+import dk.ksf.cqrs.events.internalmessages.TestEventDispatcher;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class TestKlientAggregateRepository implements CrudRepository<TestKlientAggregate, String> {
-    Map<String, TestKlientAggregate>  data = new HashMap<> ();
+public class TestKlientAggregateRepository implements CrudRepository<TestEventDispatcher, String> {
+    Map<String, TestEventDispatcher>  data = new HashMap<> ();
 
     @Override
-    public <S extends TestKlientAggregate> S save(S s) {
+    public <S extends TestEventDispatcher> S save(S s) {
         data.put(s.getId(), s);
         return s;
     }
 
     @Override
-    public <S extends TestKlientAggregate> Iterable<S> saveAll(Iterable<S> iterable) {
+    public <S extends TestEventDispatcher> Iterable<S> saveAll(Iterable<S> iterable) {
         return null;
     }
 
     @Override
-    public Optional<TestKlientAggregate> findById(String s) {
-        TestKlientAggregate result = data.get(s);
+    public Optional<TestEventDispatcher> findById(String s) {
+        TestEventDispatcher result = data.get(s);
         return Optional.ofNullable(result);
     }
 
@@ -32,12 +33,12 @@ public class TestKlientAggregateRepository implements CrudRepository<TestKlientA
     }
 
     @Override
-    public Iterable<TestKlientAggregate> findAll() {
+    public Iterable<TestEventDispatcher> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<TestKlientAggregate> findAllById(Iterable<String> iterable) {
+    public Iterable<TestEventDispatcher> findAllById(Iterable<String> iterable) {
         return null;
     }
 
@@ -52,7 +53,7 @@ public class TestKlientAggregateRepository implements CrudRepository<TestKlientA
     }
 
     @Override
-    public void delete(TestKlientAggregate testAggregate1) {
+    public void delete(TestEventDispatcher testAggregate1) {
 
     }
 
@@ -62,7 +63,7 @@ public class TestKlientAggregateRepository implements CrudRepository<TestKlientA
     }
 
     @Override
-    public void deleteAll(Iterable<? extends TestKlientAggregate> iterable) {
+    public void deleteAll(Iterable<? extends TestEventDispatcher> iterable) {
 
     }
 
