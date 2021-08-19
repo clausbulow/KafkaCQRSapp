@@ -14,19 +14,19 @@ import java.lang.reflect.Method;
 
 public class CommandExecutor extends AbstractExecutor {
     private final boolean createsAggregate;
-    private  Field targetAggregateIdentifier = null;
+    private Field targetAggregateIdentifier = null;
 
     public CommandExecutor(AbstractExecutablesContainer owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
-        super(owner, method,supportsType, factory);
+        super(owner, method, supportsType, factory);
         Aggregate classAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Aggregate.class);
         CrudRepository repository = factory.getBean(classAnnotation.repository());
         CommandHandler handlerAnnotation = AnnotationUtils.findAnnotation(method, CommandHandler.class);
         createsAggregate = handlerAnnotation.createsAggregate();
         //Parameter parameter = method.getParameters()[0];
         Class<?> parameterType = method.getParameterTypes()[1];
-        ReflectionUtils.doWithLocalFields(parameterType,field -> {
+        ReflectionUtils.doWithLocalFields(parameterType, field -> {
             TargetAggregateIdentifier annotation = AnnotationUtils.findAnnotation(field, TargetAggregateIdentifier.class);
-            if (annotation != null){
+            if (annotation != null) {
                 this.targetAggregateIdentifier = field;
                 ReflectionUtils.makeAccessible(field);
                 metaInfo.registerAggrateIdentifer(parameterType, field);
@@ -36,7 +36,7 @@ public class CommandExecutor extends AbstractExecutor {
     }
 
     @Override
-    public boolean createsAggregate(){
+    public boolean createsAggregate() {
         return this.createsAggregate;
     }
 

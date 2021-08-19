@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class OpretKlientCommand{
+public class OpretKlientCommand {
     @TargetAggregateIdentifier
     String cpr;
     String fornavn;

@@ -4,7 +4,10 @@ import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.service.EventService;
-import dk.ksf.testclasses.*;
+import dk.ksf.testclasses.TestBusinessObject1;
+import dk.ksf.testclasses.TestCommand1;
+import dk.ksf.testclasses.TestKlientAggregate;
+import dk.ksf.testclasses.TestRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,23 +22,16 @@ import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AggregateCrqsAnnotationHandlerTest {
+    final TestRepository repository = new TestRepository();
+    private final TestKlientAggregate target = new TestKlientAggregate();
     AggregateExecutablesContainer aggregateCrqsAnnotationHandler;
-
     @Mock
     AutowireCapableBeanFactory factory;
-
     CqrsMetaInfo metaInfo;
-
-
     Aggregate annotation;
-
     @Mock
     EventService eventService;
-
-    final TestRepository repository = new TestRepository();
     private Object AllCqrsAnnotationsHandler;
-
-    private final TestKlientAggregate target  = new TestKlientAggregate();
 
     @Before
     public void before() throws Exception {
@@ -52,20 +48,19 @@ public class AggregateCrqsAnnotationHandlerTest {
     }
 
 
-
     @Test
     public void testHandlersFound() throws Exception {
 
 
-        Assert.assertEquals(2,aggregateCrqsAnnotationHandler.getEventHandlerExecutors().size());
+        Assert.assertEquals(2, aggregateCrqsAnnotationHandler.getEventExecutors().size());
     }
 
     @Test
     public void testOnlyOneHandlerCalled() throws Exception {
-        TestBusinessObject1 bo = new TestBusinessObject1("id","Test1");
-        aggregateCrqsAnnotationHandler.signalEventHandlers(CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(),bo);
+        TestBusinessObject1 bo = new TestBusinessObject1("id", "Test1");
+        aggregateCrqsAnnotationHandler.signalEventHandlers(CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
 
-       // Assert.assertEquals(1, target.getCounter());
+        // Assert.assertEquals(1, target.getCounter());
     }
 
     @Test
@@ -74,9 +69,9 @@ public class AggregateCrqsAnnotationHandlerTest {
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext,command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext, command1);
         TestKlientAggregate testAggregate1 = repository.findById("key").get();
-        Assert.assertEquals(testAggregate1.getLastAction(),"s1");
+        Assert.assertEquals(testAggregate1.getLastAction(), "s1");
 
     }
 
@@ -86,11 +81,11 @@ public class AggregateCrqsAnnotationHandlerTest {
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext,command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext, command1);
         Optional<TestKlientAggregate> optionalTestAggregate1 = repository.findById("key");
         Assert.assertNotNull(optionalTestAggregate1.get());
         TestKlientAggregate testAggregate1 = optionalTestAggregate1.get();
-        Assert.assertEquals(testAggregate1.getLastAction(),"s1");
+        Assert.assertEquals(testAggregate1.getLastAction(), "s1");
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class EventProcessor  {
+public class EventProcessor {
     @Autowired
     CqrsMetaInfo metaInfo;
     @Autowired
@@ -23,17 +23,17 @@ public class EventProcessor  {
     EventDispatcher publisher;
 
 
-    public ConvertToBusinessEventResponse converToBusinessEvent(JsonNode json) throws Exception{
+    public ConvertToBusinessEventResponse converToBusinessEvent(JsonNode json) throws Exception {
         final String eventNavn = json.get("eventNavn").asText();
-        final String requestId =  json.get("requestId").asText();
+        final String requestId = json.get("requestId").asText();
         final String key = json.get("key").asText();
         String actor = json.get("actor").asText();
         long version = 0;
         final Optional<JsonNode> optionalVersion = Optional.ofNullable(json.get("version"));
-        if (optionalVersion.isPresent()){
+        if (optionalVersion.isPresent()) {
             version = optionalVersion.get().asLong();
         }
-       // AggregateTypes aggregateType = AggregateTypes.valueOf(json.get("actor").asText());
+        // AggregateTypes aggregateType = AggregateTypes.valueOf(json.get("actor").asText());
         if (eventNavn != null) {
             Class<?> eventClass = metaInfo.getEventClass(eventNavn);
             final JsonNode event = json.get("object");
@@ -48,7 +48,8 @@ public class EventProcessor  {
             return ConvertToBusinessEventResponse.builder().
                     businessEvent(eventObj).
                     context(context).
-                    build();        }
+                    build();
+        }
         return null;
     }
 }

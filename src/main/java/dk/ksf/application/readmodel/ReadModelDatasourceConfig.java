@@ -30,7 +30,7 @@ public class ReadModelDatasourceConfig {
     @Primary
     @Bean("readstoreProps")
     @ConfigurationProperties(prefix = "readstore.datasource")
-    DataSourceProperties getDatabaseProps(){
+    DataSourceProperties getDatabaseProps() {
         return new DataSourceProperties();
     }
 
@@ -39,7 +39,6 @@ public class ReadModelDatasourceConfig {
     public DataSource readDataSource(@Qualifier("readstoreProps") DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
-
 
 
     @Primary

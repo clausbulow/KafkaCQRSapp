@@ -25,7 +25,7 @@ public class KlientWriteModelRepository implements CrudRepository<KlientAggregat
         return iterable;
     }
 
-    public Optional<KlientAggregate> findById(String id){
+    public Optional<KlientAggregate> findById(String id) {
         return Optional.ofNullable(klienter.get(id));
     }
 

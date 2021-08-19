@@ -11,22 +11,22 @@ public class EventDispatcher {
     @Autowired
     AllCqrsAnnotationsHandler cqrsHandlers;
 
-    public EventDispatcher (AllCqrsAnnotationsHandler cqrsHandlers) {
+    public EventDispatcher(AllCqrsAnnotationsHandler cqrsHandlers) {
         this.cqrsHandlers = cqrsHandlers;
     }
 
 
-    public void publishEventToEventSourcing(CqrsContext context, Object event) throws Exception{
-        cqrsHandlers.signalEventSourcingHandlers(context,event);
+    public void publishEventToEventSourcing(CqrsContext context, Object event) throws Exception {
+        cqrsHandlers.signalEventSourcingHandlers(context, event);
     }
-    public void publishEventToEventHandlers(CqrsContext context,Object event) throws Exception{
+
+    public void publishEventToEventHandlers(CqrsContext context, Object event) throws Exception {
         cqrsHandlers.signalEventHandlers(context, event);
     }
 
-    public void publishCommand(CqrsContext context,Object command) throws Exception{
-        cqrsHandlers.signalCommandHandlers(context,command);
+    public void publishCommand(CqrsContext context, Object command) throws Exception {
+        cqrsHandlers.signalCommandHandlers(context, command);
     }
-
 
 
 }

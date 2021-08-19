@@ -9,26 +9,26 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name="eventstore")
+@Table(name = "eventstore")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventStoreItem {
     @Id
-    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
+    @org.hibernate.annotations.Type(type = "org.hibernate.type.PostgresUUIDType")
     UUID id;
 
-    @SequenceGenerator(name="eventstore_sequencenumber_seq",
-            sequenceName="eventstore_sequencenumber_seq",
-            allocationSize=1)
+    @SequenceGenerator(name = "eventstore_sequencenumber_seq",
+            sequenceName = "eventstore_sequencenumber_seq",
+            allocationSize = 1)
 
     String businesskey;
     String actor;
-    @Enumerated(EnumType.STRING)
-    private AggregateTypes aggregatetype;
     String requestId;
     long version;
     Date created_at;
     String data;
+    @Enumerated(EnumType.STRING)
+    private AggregateTypes aggregatetype;
 
 }

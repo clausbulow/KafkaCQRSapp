@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.Instant;
-import java.util.*;
+import java.util.UUID;
 
 @Service
 public class EventService {
@@ -29,7 +29,7 @@ public class EventService {
     public void fireEvent(Object creator, CqrsContext context, Object event) throws Exception {
         BusinessEvent<?> businessEvent = beFactory.createBusinessEvent(creator, context, event);
         AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
-        if (klientAggregateItem == null){
+        if (klientAggregateItem == null) {
             klientAggregateItem = new AggregateItem();
             klientAggregateItem.setId(UUID.randomUUID());
             klientAggregateItem.setBusinesskey(businessEvent.getKey());
@@ -47,8 +47,8 @@ public class EventService {
         //todo inspect this
         String strEvent = null;
         try {
-             strEvent = mapper.writeValueAsString(businessEvent);
-        } catch (Exception e){
+            strEvent = mapper.writeValueAsString(businessEvent);
+        } catch (Exception e) {
             System.out.println(e);
         }
         eventStoreItem.setData(strEvent);
@@ -56,7 +56,7 @@ public class EventService {
         eventStoreItem.setVersion(klientAggregateItem.getVersion());
         eventStoreItem.setRequestId(businessEvent.getRequestId());
         eventStoreItem.setCreated_at(new Date(businessEvent.getCreated_at().toEpochMilli()));
-        klientAggregateItem.setVersion(klientAggregateItem.getVersion()+1);
+        klientAggregateItem.setVersion(klientAggregateItem.getVersion() + 1);
         aggregateRepository.save(klientAggregateItem);
         eventStoreRepository.save(eventStoreItem);
     }

@@ -40,8 +40,8 @@ public class CqrsConfiguration {
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 JsonDeserializer.class);
-        props.put("spring.json.trusted.packages","*");
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
+        props.put("spring.json.trusted.packages", "*");
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
         return new DefaultKafkaConsumerFactory<>(props);
     }

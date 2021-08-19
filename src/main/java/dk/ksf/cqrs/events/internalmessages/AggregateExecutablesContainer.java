@@ -9,7 +9,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class AggregateExecutablesContainer extends AbstractExecutablesContainer {
@@ -28,7 +30,7 @@ public class AggregateExecutablesContainer extends AbstractExecutablesContainer 
     }
 
     @Override
-    void scanForAnnotations()  {
+    void scanForAnnotations() {
         ReflectionUtils.doWithLocalFields(getContainerClass(), field -> {
             AggregateIdentifier annotation = field.getAnnotation(AggregateIdentifier.class);
             if (annotation != null) {
@@ -45,7 +47,7 @@ public class AggregateExecutablesContainer extends AbstractExecutablesContainer 
     @Override
     protected Object getTargetInstance(CqrsContext context, Object command, String keyRef) throws Exception {
         Optional optional = repository.findById(keyRef);
-        if (optional.isPresent()){
+        if (optional.isPresent()) {
             return optional.get();
         }
         return null;
@@ -67,7 +69,7 @@ public class AggregateExecutablesContainer extends AbstractExecutablesContainer 
         return Arrays.asList(EventHandler.class, EventSourcingHandler.class, CommandHandler.class);
     }
 
-    public Field getKeyField(){
+    public Field getKeyField() {
         return this.keyField;
     }
 

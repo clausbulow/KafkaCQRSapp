@@ -30,7 +30,7 @@ public class KlientCommandController {
 
     @PutMapping("/klient/{cpr}")
     @ResponseBody
-    public ResponseEntity<?> processKlientOpretRequest(@PathVariable (name="cpr") String cpr, @RequestBody RetKlientDTO retKlientDTO, @RequestHeader("requestId") String requestId) throws Exception {
+    public ResponseEntity<?> processKlientOpretRequest(@PathVariable(name = "cpr") String cpr, @RequestBody RetKlientDTO retKlientDTO, @RequestHeader("requestId") String requestId) throws Exception {
         RetKlientCommand retKlientCommand = RetKlientCommand.builder().
                 fornavn(retKlientDTO.getFornavn()).
                 efternavn(retKlientDTO.getEfternavn()).

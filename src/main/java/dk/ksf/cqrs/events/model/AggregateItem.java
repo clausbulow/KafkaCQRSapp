@@ -8,18 +8,18 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name="aggregates")
+@Table(name = "aggregates")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 
 public class AggregateItem {
     @Id
-    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
+    @org.hibernate.annotations.Type(type = "org.hibernate.type.PostgresUUIDType")
     UUID id;
     long version;
     String actor;
+    String businesskey;
     @Enumerated(EnumType.STRING)
     private AggregateTypes aggregatetype;
-    String businesskey;
 }

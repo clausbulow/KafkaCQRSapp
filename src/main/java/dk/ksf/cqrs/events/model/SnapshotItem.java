@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name="snapshots")
+@Table(name = "snapshots")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class SnapshotItem {
     @Id
-    @org.hibernate.annotations.Type(type="org.hibernate.type.PostgresUUIDType")
+    @org.hibernate.annotations.Type(type = "org.hibernate.type.PostgresUUIDType")
     UUID id;
     @Enumerated(EnumType.STRING)
     AggregateTypes aggregatetype;

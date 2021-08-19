@@ -1,8 +1,8 @@
 package dk.ksf;
 
-import dk.ksf.cqrs.CqrsConfiguration;
 import dk.ksf.application.writemodel.KlientAggregate;
 import dk.ksf.application.writemodel.KlientWriteModelService;
+import dk.ksf.cqrs.CqrsConfiguration;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

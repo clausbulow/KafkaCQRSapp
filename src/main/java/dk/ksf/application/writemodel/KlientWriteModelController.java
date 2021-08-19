@@ -21,7 +21,7 @@ public class KlientWriteModelController {
 
 
     @GetMapping("/klienter")
-    public ResponseEntity<List<RetKlientDTO>> allKlienter(@RequestHeader("requestId") String requestId)  {
+    public ResponseEntity<List<RetKlientDTO>> allKlienter(@RequestHeader("requestId") String requestId) {
         log.debug("query all-clients called");
         return ResponseEntity.accepted().body(service.getAllKlienter());
     }
@@ -33,7 +33,7 @@ public class KlientWriteModelController {
     }
 
     @PostMapping("/snapshots")
-    public ResponseEntity<CreateSnapshotsResponse> createSnapshots() throws Exception  {
+    public ResponseEntity<CreateSnapshotsResponse> createSnapshots() throws Exception {
         log.debug("create Snapshots called");
         CreateSnapshotsResponse response = service.createSnapshots();
         return ResponseEntity.accepted().body(response);

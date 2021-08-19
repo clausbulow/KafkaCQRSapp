@@ -3,8 +3,8 @@ package dk.ksf.cqrs.events.internalmessages;
 import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.service.EventService;
-import dk.ksf.testclasses.TestKlientAggregate;
 import dk.ksf.testclasses.TestBusinessObject1;
+import dk.ksf.testclasses.TestKlientAggregate;
 import dk.ksf.testclasses.TestPerspective1;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AllCqrsAnnotationsHandlerTest {
@@ -27,7 +27,7 @@ public class AllCqrsAnnotationsHandlerTest {
     EventService eventService;
 
     @Before
-    public void before() throws Exception{
+    public void before() throws Exception {
         CqrsProperties props = new CqrsProperties();
         props.setEventobjectsPackage("dk.ksf.testclasses");
         metaInfo = new CqrsMetaInfo(props);
@@ -39,23 +39,23 @@ public class AllCqrsAnnotationsHandlerTest {
     }
 
     @Test
-    public void testScanForClassAnnotationsFindsOne() throws Exception{
-        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory,metaInfo,eventService);
+    public void testScanForClassAnnotationsFindsOne() throws Exception {
+        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory, metaInfo, eventService);
         allCqrsAnnotationsHandler.scanForClassAnnotation("dk.ksf.testclasses");
-        assertEquals(2,allCqrsAnnotationsHandler.getHandlerContainers().size());
+        assertEquals(2, allCqrsAnnotationsHandler.getHandlerContainers().size());
     }
 
     @Test
-    public void testScanForClassAnnotations2AreCalled() throws Exception{
+    public void testScanForClassAnnotations2AreCalled() throws Exception {
         TestPerspective1 p = new TestPerspective1();
         Mockito.when(factory.getBean(TestPerspective1.class)).thenReturn(p);
-        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory,metaInfo,eventService);
+        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory, metaInfo, eventService);
         allCqrsAnnotationsHandler.scanForClassAnnotation("dk.ksf.testclasses");
 
-        TestBusinessObject1 bo = new TestBusinessObject1("key","Test1");
+        TestBusinessObject1 bo = new TestBusinessObject1("key", "Test1");
 
         allCqrsAnnotationsHandler.signalEventHandlers(CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
-        assertEquals("b1",p.getLastAction());
+        assertEquals("b1", p.getLastAction());
     }
 
 }

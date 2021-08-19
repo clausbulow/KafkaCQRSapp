@@ -21,14 +21,8 @@ public abstract class AbstractExecutablesContainer {
     private final AutowireCapableBeanFactory beanFactory;
     private final CqrsMetaInfo metaInfo;
     private final EventService eventService;
-
-    public abstract List<Class> memberAnnotationsOfInterest();
-
-
     private final Map<Class, List<AbstractExecutor>> handlerExecutors = new HashMap<>();
-
     private final Class containerClass;
-
     private final ExectutorFactory exectutorFactory;
 
     public AbstractExecutablesContainer(Class containerClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
@@ -40,18 +34,20 @@ public abstract class AbstractExecutablesContainer {
 
     }
 
+    public abstract List<Class> memberAnnotationsOfInterest();
+
     public Class getContainerClass() {
         return containerClass;
     }
 
-    void scanForAnnotations()  {
+    void scanForAnnotations() {
 
         ReflectionUtils.doWithMethods(containerClass, method -> {
             List<Class> classes = memberAnnotationsOfInterest();
             classes.forEach(ExceptionConsumer.wrapper(annotationClass -> {
                 Annotation annotation = AnnotationUtils.findAnnotation(method, annotationClass);
                 if (annotation != null) {
-                        createHandlerExecutor(method, annotation, annotationClass, beanFactory);
+                    createHandlerExecutor(method, annotation, annotationClass, beanFactory);
                 }
             }));
         });
@@ -59,8 +55,8 @@ public abstract class AbstractExecutablesContainer {
 
     private void createHandlerExecutor(Method method, Annotation annotation, Class annotationClass, AutowireCapableBeanFactory factory) throws Exception {
         //Assert that BusinessEvent and command handler is last param
-        ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount()-1);
-        AbstractExecutor abstractExecutor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
+        ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount() - 1);
+        AbstractExecutor executor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
                 method(method).
                 targetType(targetType).
                 annotationClass(annotationClass).
@@ -74,26 +70,25 @@ public abstract class AbstractExecutablesContainer {
         } else {
             executors = handlerExecutors.get(annotationClass);
         }
-        executors.add(abstractExecutor);
+        executors.add(executor);
     }
 
 
-
-    public List<AbstractExecutor> getEventSourcingHandlerExecutors() {
+    public List<AbstractExecutor> getEventSourcingExecutors() {
         if (handlerExecutors.containsKey(EventSourcingHandler.class)) {
             return handlerExecutors.get(EventSourcingHandler.class);
         }
         return new ArrayList<>();
     }
 
-    public List<AbstractExecutor> getEventHandlerExecutors() {
+    public List<AbstractExecutor> getEventExecutors() {
         if (handlerExecutors.containsKey(EventHandler.class)) {
             return handlerExecutors.get(EventHandler.class);
         }
         return new ArrayList<>();
     }
 
-    public List<AbstractExecutor> getCommandHandlerExecutors() {
+    public List<AbstractExecutor> getCommandExecutors() {
         if (handlerExecutors.containsKey(CommandHandler.class)) {
             return handlerExecutors.get(CommandHandler.class);
         }
@@ -102,39 +97,40 @@ public abstract class AbstractExecutablesContainer {
 
 
     public void signalCommandHandlers(CqrsContext context, Object command) throws Exception {
-        List<AbstractExecutor> commandAbstractExecutors = getCommandHandlerExecutors();
-        context.setKey((String)metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
-        commandAbstractExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
-            if (!executor.supports(command)){
+        List<AbstractExecutor> commandExecutors = getCommandExecutors();
+        context.setKey((String) metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
+        commandExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
+            if (!executor.supports(command)) {
                 return;
             }
-                Object target;
-                if (executor.createsAggregate()){
-                    target = this.containerClass.getConstructor().newInstance();
-                    setTargetKeyValue(target, context.getKey());
-                    beanFactory.autowireBean(target);
-                } else {
-                    target= getTargetInstance(context, command, context.getKey());
+            Object target;
+            if (executor.createsAggregate()) {
+                target = this.containerClass.getConstructor().newInstance();
+                setTargetKeyValue(target, context.getKey());
+                beanFactory.autowireBean(target);
+            } else {
+                target = getTargetInstance(context, command, context.getKey());
+            }
+            context.setTargetInstance(target);
+            Object commandResult = executor.execute(context, command);
+            if (commandResult != null) {
+                if (command.getClass().isArray()) {
+                    Object[] commandresults = (Object[]) commandResult;
+                    Arrays.asList(commandresults).forEach(ExceptionConsumer.wrapper(result -> processSingleCommandResult(context, result)));
                 }
-                context.setTargetInstance(target);
-                Object commandResult = executor.execute(context, command);
-                if (commandResult != null){
-                    if (command.getClass().isArray()) {
-                        Object[] commandresults = (Object[]) commandResult;
-                        Arrays.asList(commandresults).forEach(ExceptionConsumer.wrapper(result -> processSingleCommandResult(context,result)));
-                    } {
-                        processSingleCommandResult(context,commandResult);
-                    }
+                {
+                    processSingleCommandResult(context, commandResult);
                 }
+            }
         }));
     }
 
 
     private void processSingleCommandResult(CqrsContext context, Object event) throws Exception {
-        log.info("Processing event produced from handler");
+        log.info("Processing event produced from commandhandler");
         if (metaInfo.getEventName(event.getClass()) != null) {
             signalEventSourcingHandlers(context, event);
-            eventService.fireEvent(context.getTargetInstance(),context,event);
+            eventService.fireEvent(context.getTargetInstance(), context, event);
         }
 
     }
@@ -146,33 +142,33 @@ public abstract class AbstractExecutablesContainer {
     protected abstract void save(Object target, String keyRef) throws Exception;
 
 
-    public void signalEventHandlers(CqrsContext context, Object event)  {
-        List<AbstractExecutor> eventAbstractExecutors = getEventHandlerExecutors();
+    public void signalEventHandlers(CqrsContext context, Object event) {
+        List<AbstractExecutor> eventExecutors = getEventExecutors();
         context.setTargetInstance(beanFactory.getBean(this.containerClass));
-        eventAbstractExecutors.forEach(ExceptionConsumer.wrapper(excecutor -> excecutor.execute(context,event)));
+        eventExecutors.forEach(ExceptionConsumer.wrapper(excecutor -> excecutor.execute(context, event)));
     }
 
-    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception{
-        List<AbstractExecutor> eventAbstractExecutors = getEventSourcingHandlerExecutors();
-        context.setKey((String)metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
+    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception {
+        List<AbstractExecutor> eventSourcingExecutors = getEventSourcingExecutors();
+        context.setKey((String) metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
 
-        eventAbstractExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
-                if (!executor.supports(event)){
-                    return;
+        eventSourcingExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
+            if (!executor.supports(event)) {
+                return;
+            }
+            Object target = context.getTargetInstance();
+            if (target == null) {
+                target = getTargetInstance(context, event, context.getKey());
+                if (target == null) {
+                    target = this.containerClass.getConstructor().newInstance();
+                    setTargetKeyValue(target, context.getKey());
+                    beanFactory.autowireBean(target);
                 }
-                Object target = context.getTargetInstance();
-                if (target == null){
-                       target = getTargetInstance(context, event, context.getKey());
-                        if (target == null) {
-                            target = this.containerClass.getConstructor().newInstance();
-                            setTargetKeyValue(target, context.getKey());
-                            beanFactory.autowireBean(target);
-                        }
-                        context.setTargetInstance(target);
-                }
+                context.setTargetInstance(target);
+            }
 
-                executor.execute(context, event);
-                save(target, context.getKey());
+            executor.execute(context, event);
+            save(target, context.getKey());
         }));
     }
 

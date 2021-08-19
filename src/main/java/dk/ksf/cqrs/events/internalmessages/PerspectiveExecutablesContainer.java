@@ -1,7 +1,8 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.CqrsContext;
-import dk.ksf.cqrs.events.annotations.*;
+import dk.ksf.cqrs.events.annotations.EventHandler;
+import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.cqrs.exceptions.MessageException;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.repository.CrudRepository;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -45,7 +45,7 @@ public class PerspectiveExecutablesContainer extends AbstractExecutablesContaine
 
     }
 
-    public Field getKeyField(){
+    public Field getKeyField() {
         return this.keyField;
     }
 

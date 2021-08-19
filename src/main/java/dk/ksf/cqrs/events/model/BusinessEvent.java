@@ -10,15 +10,15 @@ import java.time.Instant;
 
 @Builder
 @Data
-public  class BusinessEvent<T>  implements ResolvableTypeProvider {
+public class BusinessEvent<T> implements ResolvableTypeProvider {
+    T object;
     private String eventNavn;
     private String requestId;
     private String key;
     private String actor;
     private long version;
-    private  Instant created_at;
+    private Instant created_at;
     private AggregateTypes aggregateType;
-    T object;
 
     @Override
     @JsonIgnore

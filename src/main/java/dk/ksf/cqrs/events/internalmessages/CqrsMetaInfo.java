@@ -31,7 +31,7 @@ public class CqrsMetaInfo {
 
     private final Map<Class<?>, Field> classToKeyField = new HashMap<>();
 
-    public CqrsMetaInfo (CqrsProperties props){
+    public CqrsMetaInfo(CqrsProperties props) {
         this.props = props;
     }
 
@@ -41,7 +41,7 @@ public class CqrsMetaInfo {
     }
 
     public Class<?> getEventClass(String eventNavn) {
-        return  eventNamesToClasses.get(eventNavn);
+        return eventNamesToClasses.get(eventNavn);
     }
 
     @PostConstruct
@@ -49,29 +49,29 @@ public class CqrsMetaInfo {
         scanForBusinessObjects();
     }
 
-    private void scanForBusinessObjects() throws Exception{
+    private void scanForBusinessObjects() throws Exception {
         ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
         //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
         Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(props.getEventobjectsPackage());
-        for (BeanDefinition definition: candidateComponents){
+        for (BeanDefinition definition : candidateComponents) {
             System.out.println(definition.getBeanClassName());
             Class clazz = Class.forName(definition.getBeanClassName());
             //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
             BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
             String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
-            eventNamesToClasses.put(eventName,clazz);
+            eventNamesToClasses.put(eventName, clazz);
             eventClassesToNames.put(clazz, eventName);
         }
     }
 
     public void registerAggregate(AggregateTypes aggregateType, Class clazz) {
         this.aggregateTypeToClass.put(aggregateType, clazz);
-        this.aggregateClassesToAggregateType.put(clazz,aggregateType);
+        this.aggregateClassesToAggregateType.put(clazz, aggregateType);
     }
 
-    public Collection<AggregateTypes> getAggregatesSupportedInApplication(){
+    public Collection<AggregateTypes> getAggregatesSupportedInApplication() {
         return this.aggregateClassesToAggregateType.values();
     }
 
@@ -80,18 +80,20 @@ public class CqrsMetaInfo {
     }
 
     public void registerKeyField(Class containerClass, Field field) {
-        classToKeyField.put(containerClass,field);
+        classToKeyField.put(containerClass, field);
     }
+
     public Field getKeyField(Class containerClass) {
         return classToKeyField.get(containerClass);
     }
 
     public void registerAggrateIdentifer(Class parameterType, Field field) {
-        if (!this.aggregateIdentfierFieldsToClass.containsKey(parameterType)){
+        if (!this.aggregateIdentfierFieldsToClass.containsKey(parameterType)) {
             this.aggregateIdentfierFieldsToClass.put(parameterType, field);
         }
     }
-    public Field getAggregateIdentifierFromClass(Class clazz){
+
+    public Field getAggregateIdentifierFromClass(Class clazz) {
         return this.aggregateIdentfierFieldsToClass.get(clazz);
     }
 }

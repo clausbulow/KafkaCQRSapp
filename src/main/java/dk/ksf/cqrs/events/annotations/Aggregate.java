@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Aggregate {
     AggregateTypes aggregateType();
+
     Class<? extends CrudRepository> repository();
 }

@@ -16,13 +16,13 @@ public class ExectutorFactory {
 
     AbstractExecutor createHandlerExecutor(ExecutorFactoryParams params) throws Exception {
         if (params.getAnnotationClass() == EventHandler.class) {
-            return new EventExecutor(params.getOwner(),params.getMethod(), params.getTargetType(), params.getFactory());
+            return new EventExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory());
         }
         if (params.getAnnotationClass() == CommandHandler.class) {
-            return new CommandExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(),metaInfo);
+            return new CommandExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(), metaInfo);
         }
         if (params.getAnnotationClass() == EventSourcingHandler.class) {
-            return new EventSourcingExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(),metaInfo);
+            return new EventSourcingExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(), metaInfo);
         }
         throw new MessageException("Illegal annotion used... can not create handler-excecutor");
 

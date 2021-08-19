@@ -12,10 +12,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class EventSourcingExecutor extends AbstractExecutor {
-    private  Field aggregateIdentifier;
     public final CrudRepository repository;
+    private Field aggregateIdentifier;
+
     public EventSourcingExecutor(Object owner, Method method, ResolvableType supportsType, AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo) {
-        super(owner,method, supportsType,factory);
+        super(owner, method, supportsType, factory);
         Aggregate classAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), Aggregate.class);
         repository = factory.getBean(classAnnotation.repository());
 
@@ -23,7 +24,7 @@ public class EventSourcingExecutor extends AbstractExecutor {
 
         ReflectionUtils.doWithLocalFields(parameterType, field -> {
             AggregateIdentifier annotation = AnnotationUtils.findAnnotation(field, AggregateIdentifier.class);
-            if (annotation != null){
+            if (annotation != null) {
                 this.aggregateIdentifier = field;
                 ReflectionUtils.makeAccessible(field);
                 metaInfo.registerAggrateIdentifer(parameterType, field);

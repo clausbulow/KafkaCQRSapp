@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class RetKlientCommand{
+public class RetKlientCommand {
     @TargetAggregateIdentifier
     String cpr;
     String fornavn;

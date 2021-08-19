@@ -86,8 +86,8 @@ public class EventStore2EventSourceProcessor {
         initializeFromAggregates.forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> {
                     try {
                         ConvertToBusinessEventResponse eventWithContext = eventProcessor.converToBusinessEvent(eventStoreItem);
-                        dispatcher.publishEventToEventSourcing(eventWithContext.getContext(),eventWithContext.getBusinessEvent());
-                        dispatcher.publishEventToEventHandlers(eventWithContext.getContext(),eventWithContext.getBusinessEvent());
+                        dispatcher.publishEventToEventSourcing(eventWithContext.getContext(), eventWithContext.getBusinessEvent());
+                        dispatcher.publishEventToEventHandlers(eventWithContext.getContext(), eventWithContext.getBusinessEvent());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

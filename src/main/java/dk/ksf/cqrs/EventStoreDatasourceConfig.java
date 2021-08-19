@@ -29,7 +29,7 @@ import java.util.Properties;
 public class EventStoreDatasourceConfig {
     @Bean("eventstoreProps")
     @ConfigurationProperties(prefix = "eventstore.datasource")
-    DataSourceProperties getDatabaseProps(){
+    DataSourceProperties getDatabaseProps() {
         return new DataSourceProperties();
     }
 

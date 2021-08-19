@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="klienter")
+@Table(name = "klienter")
 public class KlientReadModelItem {
     @AggregateIdentifier
     @Id

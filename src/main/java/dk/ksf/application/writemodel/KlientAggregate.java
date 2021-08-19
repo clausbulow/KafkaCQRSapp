@@ -1,22 +1,27 @@
 //inspired by https://blog.nebrass.fr/playing-with-cqrs-and-event-sourcing-in-spring-boot-and-axon/
 package dk.ksf.application.writemodel;
 
+import dk.ksf.application.common.eventobjects.KlientOprettetObject;
+import dk.ksf.application.common.eventobjects.KlientRettetObject;
+import dk.ksf.application.writemodel.commands.OpretKlientCommand;
+import dk.ksf.application.writemodel.commands.RetKlientCommand;
 import dk.ksf.cqrs.events.CqrsContext;
-import dk.ksf.cqrs.events.annotations.*;
+import dk.ksf.cqrs.events.annotations.Aggregate;
+import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
+import dk.ksf.cqrs.events.annotations.CommandHandler;
+import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
 import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.service.AggregateLifecycle;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import dk.ksf.application.writemodel.commands.*;
-import dk.ksf.application.common.eventobjects.*;
 
 @Slf4j
 @NoArgsConstructor
 @Data
 @Aggregate(aggregateType = AggregateTypes.klient, repository = KlientWriteModelRepository.class)
-public class KlientAggregate  {
+public class KlientAggregate {
 
     @AggregateIdentifier
     String cpr;
@@ -28,7 +33,7 @@ public class KlientAggregate  {
     AggregateLifecycle aggregateLifecycle;
 
     @CommandHandler(createsAggregate = true)
-    public KlientOprettetObject opretKlient(CqrsContext context, OpretKlientCommand command) throws Exception{
+    public KlientOprettetObject opretKlient(CqrsContext context, OpretKlientCommand command) throws Exception {
         return KlientOprettetObject.builder().
                 cpr(command.getCpr()).
                 efternavn(command.getEfternavn()).
@@ -37,7 +42,7 @@ public class KlientAggregate  {
     }
 
     @EventSourcingHandler
-    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception{
+    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception {
         fornavn = event.getFornavn();
         efternavn = event.getEfternavn();
         cpr = event.getCpr();
@@ -46,12 +51,12 @@ public class KlientAggregate  {
     }
 
     @CommandHandler
-    public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand command) throws Exception{
+    public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand command) throws Exception {
         return KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
     }
 
     @EventSourcingHandler
-    public void onKlientRettetEvent(CqrsContext context,KlientRettetObject event) throws Exception{
+    public void onKlientRettetEvent(CqrsContext context, KlientRettetObject event) throws Exception {
         fornavn = event.getFornavn();
         efternavn = event.getEfternavn();
         cpr = event.getCpr();
