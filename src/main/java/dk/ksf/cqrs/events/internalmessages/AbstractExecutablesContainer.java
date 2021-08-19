@@ -5,6 +5,7 @@ import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
 import dk.ksf.cqrs.events.service.EventService;
+import dk.ksf.cqrs.exceptions.ExceptionConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
@@ -43,20 +44,16 @@ public abstract class AbstractExecutablesContainer {
         return containerClass;
     }
 
-    void scanForAnnotations() throws Exception {
+    void scanForAnnotations()  {
 
         ReflectionUtils.doWithMethods(containerClass, method -> {
             List<Class> classes = memberAnnotationsOfInterest();
-            classes.forEach(annotationClass -> {
+            classes.forEach(ExceptionConsumer.wrapper(annotationClass -> {
                 Annotation annotation = AnnotationUtils.findAnnotation(method, annotationClass);
                 if (annotation != null) {
-                    try {
                         createHandlerExecutor(method, annotation, annotationClass, beanFactory);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
-            });
+            }));
         });
     }
 
@@ -107,11 +104,10 @@ public abstract class AbstractExecutablesContainer {
     public void signalCommandHandlers(CqrsContext context, Object command) throws Exception {
         List<AbstractExecutor> commandAbstractExecutors = getCommandHandlerExecutors();
         context.setKey((String)metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
-        commandAbstractExecutors.forEach(executor -> {
+        commandAbstractExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
             if (!executor.supports(command)){
                 return;
             }
-            try {
                 Object target;
                 if (executor.createsAggregate()){
                     target = this.containerClass.getConstructor().newInstance();
@@ -125,21 +121,12 @@ public abstract class AbstractExecutablesContainer {
                 if (commandResult != null){
                     if (command.getClass().isArray()) {
                         Object[] commandresults = (Object[]) commandResult;
-                        Arrays.asList(commandresults).forEach(result -> {
-                            try {
-                                processSingleCommandResult(context,result);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
+                        Arrays.asList(commandresults).forEach(ExceptionConsumer.wrapper(result -> processSingleCommandResult(context,result)));
                     } {
                         processSingleCommandResult(context,commandResult);
                     }
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to execute: " + e.getMessage());
-            }
-        });
+        }));
     }
 
 
@@ -159,23 +146,17 @@ public abstract class AbstractExecutablesContainer {
     protected abstract void save(Object target, String keyRef) throws Exception;
 
 
-    public void signalEventHandlers(CqrsContext context, Object event) throws Exception {
+    public void signalEventHandlers(CqrsContext context, Object event)  {
         List<AbstractExecutor> eventAbstractExecutors = getEventHandlerExecutors();
         context.setTargetInstance(beanFactory.getBean(this.containerClass));
-        eventAbstractExecutors.forEach(executor -> {
-            try {
-                executor.execute(context, event);
-            } catch (Exception e) {
-            }
-        });
+        eventAbstractExecutors.forEach(ExceptionConsumer.wrapper(excecutor -> excecutor.execute(context,event)));
     }
 
-    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception {
+    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception{
         List<AbstractExecutor> eventAbstractExecutors = getEventSourcingHandlerExecutors();
         context.setKey((String)metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
 
-        eventAbstractExecutors.forEach(executor -> {
-            try {
+        eventAbstractExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
                 if (!executor.supports(event)){
                     return;
                 }
@@ -192,10 +173,7 @@ public abstract class AbstractExecutablesContainer {
 
                 executor.execute(context, event);
                 save(target, context.getKey());
-
-            } catch (Exception e) {
-            }
-        });
+        }));
     }
 
 

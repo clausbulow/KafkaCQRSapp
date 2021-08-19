@@ -3,6 +3,7 @@ package dk.ksf.cqrs.events.internalmessages;
 import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.service.EventService;
+import dk.ksf.cqrs.exceptions.ExceptionConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -47,14 +48,8 @@ public class AllCqrsAnnotationsHandler {
 
     }
 
-    public void scanHandlerContainersForHandlers() throws Exception {
-        abstractExecutablesContainers.forEach(handlerContainer -> {
-            try {
-                handlerContainer.scanForAnnotations();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    public void scanHandlerContainersForHandlers()  {
+        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(handlerContainer -> handlerContainer.scanForAnnotations()));
     }
 
     public void scanClassForHandlerContainers(final Class clazz) {
@@ -74,33 +69,15 @@ public class AllCqrsAnnotationsHandler {
     }
 
     public void signalEventHandlers (CqrsContext context, Object event) throws Exception{
-        abstractExecutablesContainers.forEach(container -> {
-            try {
-                container.signalEventHandlers(context, event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalEventHandlers(context, event)));
     }
 
     public void signalEventSourcingHandlers (CqrsContext context, Object event) throws Exception{
-        abstractExecutablesContainers.forEach(container -> {
-            try {
-                container.signalEventSourcingHandlers(context, event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalEventSourcingHandlers(context, event)));
     }
 
     public void signalCommandHandlers (CqrsContext context, Object command) throws Exception{
-        abstractExecutablesContainers.forEach(container -> {
-            try {
-                container.signalCommandHandlers(context,command);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalCommandHandlers(context,command)));
     }
 
 

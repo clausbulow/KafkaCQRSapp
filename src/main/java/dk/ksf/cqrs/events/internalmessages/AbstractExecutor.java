@@ -1,6 +1,7 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.exceptions.MessageException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
@@ -23,11 +24,10 @@ public abstract class AbstractExecutor {
 
 
     public Object execute (CqrsContext context,Object event) throws Exception{
-
         if (this.supports(event)) {
             return ReflectionUtils.invokeMethod(method, context.getTargetInstance(), context, event);
         } else {
-            return null;
+           return null;
         }
     }
 

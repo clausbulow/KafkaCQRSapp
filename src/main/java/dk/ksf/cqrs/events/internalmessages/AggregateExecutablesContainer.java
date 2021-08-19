@@ -28,7 +28,7 @@ public class AggregateExecutablesContainer extends AbstractExecutablesContainer 
     }
 
     @Override
-    void scanForAnnotations() throws Exception {
+    void scanForAnnotations()  {
         ReflectionUtils.doWithLocalFields(getContainerClass(), field -> {
             AggregateIdentifier annotation = field.getAnnotation(AggregateIdentifier.class);
             if (annotation != null) {
