@@ -1,6 +1,5 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.*;
 import dk.ksf.cqrs.events.service.EventService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,7 @@ public class AggregateExecutablesContainer extends AbstractExecutablesContainer 
     }
 
     @Override
-    protected Object getTargetInstance(CqrsContext context, Object command, String keyRef) throws Exception {
+    protected Object getTargetInstance(MessageContext context, Object command, String keyRef) throws Exception {
         Optional optional = repository.findById(keyRef);
         if (optional.isPresent()) {
             return optional.get();

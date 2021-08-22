@@ -2,7 +2,7 @@ package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.internalmessages.MessageContext;
 import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class EventProcessor {
             Class<?> eventClass = metaInfo.getEventClass(eventNavn);
             final JsonNode event = json.get("object");
             final Object eventObj = mapper.treeToValue(event, eventClass);
-            final CqrsContext context = CqrsContext.builder().
+            final MessageContext context = MessageContext.builder().
                     requestId(requestId).
                     eventNavn(eventNavn).
                     key(key).

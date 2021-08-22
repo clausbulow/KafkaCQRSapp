@@ -1,8 +1,8 @@
-package dk.ksf.cqrs.events;
+package dk.ksf.cqrs.events.model;
 
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.internalmessages.MessageContext;
 import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
-import dk.ksf.cqrs.events.model.BusinessEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class BusinessEventFactory {
         this.metaInfo = metaInfo;
     }
 
-    public <T> BusinessEvent<T> createBusinessEvent(Object creator, CqrsContext context, T businessObject) throws Exception {
+    public <T> BusinessEvent<T> createBusinessEvent(Object creator, MessageContext context, T businessObject) throws Exception {
         Field keyField = metaInfo.getKeyField(creator.getClass());
         keyField.get(creator);
 

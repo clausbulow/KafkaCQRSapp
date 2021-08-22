@@ -1,7 +1,6 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.CqrsProperties;
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.TestBusinessObject1;
 import dk.ksf.testclasses.TestKlientAggregate;
@@ -17,7 +16,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AllCqrsAnnotationsHandlerTest {
+public class AllExecutablesContainerTest {
     @Mock
     AutowireCapableBeanFactory factory;
 
@@ -40,21 +39,21 @@ public class AllCqrsAnnotationsHandlerTest {
 
     @Test
     public void testScanForClassAnnotationsFindsOne() throws Exception {
-        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory, metaInfo, eventService);
-        allCqrsAnnotationsHandler.scanForClassAnnotation("dk.ksf.testclasses");
-        assertEquals(2, allCqrsAnnotationsHandler.getHandlerContainers().size());
+        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService);
+        allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
+        assertEquals(2, allExecutablesContainer.getHandlerContainers().size());
     }
 
     @Test
     public void testScanForClassAnnotations2AreCalled() throws Exception {
         TestPerspective1 p = new TestPerspective1();
         Mockito.when(factory.getBean(TestPerspective1.class)).thenReturn(p);
-        AllCqrsAnnotationsHandler allCqrsAnnotationsHandler = new AllCqrsAnnotationsHandler(factory, metaInfo, eventService);
-        allCqrsAnnotationsHandler.scanForClassAnnotation("dk.ksf.testclasses");
+        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService);
+        allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
 
         TestBusinessObject1 bo = new TestBusinessObject1("key", "Test1");
 
-        allCqrsAnnotationsHandler.signalEventHandlers(CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
+        allExecutablesContainer.signalEventHandlers(MessageContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
         assertEquals("b1", p.getLastAction());
     }
 

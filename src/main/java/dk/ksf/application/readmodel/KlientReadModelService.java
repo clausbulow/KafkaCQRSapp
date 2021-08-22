@@ -3,7 +3,7 @@ package dk.ksf.application.readmodel;
 import dk.ksf.application.common.dto.RetKlientDTO;
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.common.eventobjects.KlientRettetObject;
-import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.internalmessages.MessageContext;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.Perspective;
 import lombok.extern.slf4j.Slf4j;
@@ -66,14 +66,14 @@ public class KlientReadModelService {
     //Eventhandling...
     @EventHandler
     @Transactional
-    public void onKlientRettetEvent(CqrsContext context, KlientRettetObject event) throws Exception {
+    public void onKlientRettetEvent(MessageContext context, KlientRettetObject event) throws Exception {
         retKlient(event, context.getVersion());
         log.info("Klient rettet i read-model");
     }
 
     @EventHandler
     @Transactional
-    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception {
+    public void onKlientOprettetEvent(MessageContext context, KlientOprettetObject event) throws Exception {
         opretKlient(event, context.getVersion());
         log.info("Klient oprettet i read-model");
     }

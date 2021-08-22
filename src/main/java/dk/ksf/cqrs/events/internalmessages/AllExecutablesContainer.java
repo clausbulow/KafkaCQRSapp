@@ -1,6 +1,5 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.service.EventService;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class AllCqrsAnnotationsHandler {
+public class AllExecutablesContainer {
     final List<AbstractExecutablesContainer> abstractExecutablesContainers = new ArrayList<>();
     private final AutowireCapableBeanFactory factory;
     private final CqrsMetaInfo metaInfo;
@@ -27,7 +26,7 @@ public class AllCqrsAnnotationsHandler {
     private final List<Class> classAnnotationsOfInterest = Arrays.asList(
             Aggregate.class, Perspective.class
     );
-    public AllCqrsAnnotationsHandler(AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo, EventService eventService) {
+    public AllExecutablesContainer(AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo, EventService eventService) {
         this.factory = factory;
         this.metaInfo = metaInfo;
         this.eventService = eventService;
@@ -68,15 +67,15 @@ public class AllCqrsAnnotationsHandler {
         return abstractExecutablesContainers;
     }
 
-    public void signalEventHandlers(CqrsContext context, Object event) throws Exception {
+    public void signalEventHandlers(MessageContext context, Object event) throws Exception {
         abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalEventHandlers(context, event)));
     }
 
-    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception {
+    public void signalEventSourcingHandlers(MessageContext context, Object event) throws Exception {
         abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalEventSourcingHandlers(context, event)));
     }
 
-    public void signalCommandHandlers(CqrsContext context, Object command) throws Exception {
+    public void signalCommandHandlers(MessageContext context, Object command) throws Exception {
         abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalCommandHandlers(context, command)));
     }
 

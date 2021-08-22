@@ -1,8 +1,8 @@
 package dk.ksf.cqrs.events.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.ksf.cqrs.events.BusinessEventFactory;
-import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.model.BusinessEventFactory;
+import dk.ksf.cqrs.events.internalmessages.MessageContext;
 import dk.ksf.cqrs.events.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class EventService {
     @Autowired
     ObjectMapper mapper;
 
-    public void fireEvent(Object creator, CqrsContext context, Object event) throws Exception {
+    public void fireEvent(Object creator, MessageContext context, Object event) throws Exception {
         BusinessEvent<?> businessEvent = beFactory.createBusinessEvent(creator, context, event);
         AggregateItem klientAggregateItem = aggregateRepository.findByTypeAndKey(businessEvent.getAggregateType(), businessEvent.getKey());
         if (klientAggregateItem == null) {

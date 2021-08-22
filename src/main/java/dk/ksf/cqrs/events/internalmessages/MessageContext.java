@@ -1,11 +1,11 @@
-package dk.ksf.cqrs.events;
+package dk.ksf.cqrs.events.internalmessages;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class CqrsContext {
+public class MessageContext {
     private String requestId;
     private Object targetInstance;
     private String key;

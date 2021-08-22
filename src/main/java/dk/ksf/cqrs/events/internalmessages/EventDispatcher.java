@@ -1,6 +1,5 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,22 +8,22 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EventDispatcher {
     @Autowired
-    AllCqrsAnnotationsHandler cqrsHandlers;
+    AllExecutablesContainer cqrsHandlers;
 
-    public EventDispatcher(AllCqrsAnnotationsHandler cqrsHandlers) {
+    public EventDispatcher(AllExecutablesContainer cqrsHandlers) {
         this.cqrsHandlers = cqrsHandlers;
     }
 
 
-    public void publishEventToEventSourcing(CqrsContext context, Object event) throws Exception {
+    public void publishEventToEventSourcing(MessageContext context, Object event) throws Exception {
         cqrsHandlers.signalEventSourcingHandlers(context, event);
     }
 
-    public void publishEventToEventHandlers(CqrsContext context, Object event) throws Exception {
+    public void publishEventToEventHandlers(MessageContext context, Object event) throws Exception {
         cqrsHandlers.signalEventHandlers(context, event);
     }
 
-    public void publishCommand(CqrsContext context, Object command) throws Exception {
+    public void publishCommand(MessageContext context, Object command) throws Exception {
         cqrsHandlers.signalCommandHandlers(context, command);
     }
 

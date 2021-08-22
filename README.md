@@ -65,49 +65,43 @@ Løsningen arbejder arbejder med 3 typer af handlers, nemlig:
 
 ### Så - hvor og hvornår anvendes hvilke handlere?
 
-1. Commands skabes a Querymodellen og aftages i en Command-handler i et "Aggregate". Aggregaten skal validerer
+1. Commands skabes via en commandcontroller (som f.eks. aktiveres fra en rest-service) og aftages i en Command-handler i et "Aggregate". Aggregaten skal validerer
    kommandoen og dernæste skabe et tilhørende forretningsevent.
 2. Forretningsevent/Business events skabes i et Aggregate og aftages dels i aggregatet selv i en "event sourcing
    handler" og dels af en eller flere "Event Handlers", der hvert hører sit "Perspektiv" til.
    "Event Sourcing handlers" opgave er at opdatere den instans af aggregatet, som Business Eventen addresserer.
    "Event handlers" opgave er, at opdatere et pespektiv på de data, som et business-event bærer på.
 
-I et simplificeret kontext diagram, ser anvendelse af handlers således ud:
-![Handlers](http://www.plantuml.com/plantuml/png/bPBBJiCm44Nt_Wgh6yeYP1zLaTg2nA98XKYmDiuqMFZLiLqfVq_UBrY4NMOqzyxrdDnzUMzT4iTMCks3aW_SgDZ1DO3c4EM25SWK8InueuFw12JapD0BBcmbeDTG0fQKERfv3VNNYyb1RkXkHm_12GtExQsLWZClZAPfEbEpea0ec8V6ODzNQ-LINE1OSWdFJCiSi74vjStlffjBmDLkXZFvUFX0qUKvjOsrUkUhw9atsAgpeLnhO06T1Ux5hNKuZ_K_t_06B5_x1D8XZD8HHqAFHgdgVDq9jxmjxyb8R3x_3YWkPI-RZoqn9RIEK0w1dcwWFVa5SxwW7ifCG2vqqQMYsvd38jmKPqA3pUj-KqNDF_hdmf5XGYy2eJ5Uhfc0ZYhD15iRq_TNM-YcVCU0DQiXNrrqyGZv0G00)
+I et simplificeret kontext diagram, ser sekvensen ved opdatering via en command således ud:
+![Handlers](http://www.plantuml.com/plantuml/svg/bPNBZfim58RtVWehcyaiQFPeX9IabMRKLeecLRjsp0bZ1MpgIwHv-ng8YGs6q1qs_Z-Vkvy-jAvLkjdK9U7QLEKNAggDWhy6E8KaPwIGf4A862sugKuW4JeGgHbbjHLWAhYMeYn1OgBmQY-gYl0Sx_lj5NvvmJkZ60UbjdLTCaeq4nndMG22At3zQhKEzStRQ24Ds-hs8eUXc1I5X89eUEDA4sjuIzYwtQKsz1W9jL1C2_aPWjxx_GOP8Gw0fQ2a_Bhx8vdkJFhHROpyYKRZQ2_ohhn7HJK_S6YCHnkmR4GqjAoMSEoNyx8BELz8g_ZUV3M7t_XP4gMbeTh8w7cRTsMgMmPR7NPRyxVL85KDLBDhP-NXlbwQFGyn2DeXzcUrZ7fBuJkGV9J12Jb2NbSaML3QARwro6szfjtoEUrfROfHq0yZo9dnF0ID195YxdJROREWMDrRWb-zwRZ7K53TKpUIfRU53evba_wv4obc_2ekC15WXCPJ8exv3PATFrsYuhBGMWcs8JW--HbKDZwYncSXCH3wSJi3UNWAOVmuqnrF64aPBro-nyB9YBJwOwXV1sOyMzpIy9Wwj-k-YjfvCgRDUtM2Wl5Vad15QDCsSzxurQJ85TOZcmBhvsfuMXurTp20EttGfXD-3oUt1Twdy7BCPFY0vs7ml1cV95axYbESCpkhsSdeHvTrezu9tS1kofeoU_6SoXrEij12nGfEolzmSWZewzxLwsvUxKt_eEmdvPx0nZVwUBXQRuR_J_jcbMCNeheayrwDXn2RJFja_0C0)
 
 ### Implementering af handlere
 
 Handlere skabes ved at hjælp af annoteringer i koden - således kan en command-handler skabes således:
 
 ```
-    @CommandHandler
-    public void onRetKlientCommand(RetKlientCommand command) throws Exception{
-        KlientRettetObject businessObject = KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
-        BusinessEvent businessEvent =
-                BusinessEvent.<KlientRettetObject>builder().
-                        eventNavn(eventService.getEventName(KlientRettetObject.class)).
-                        aggregateType(KlientAggregate.this_aggregate_type).
-                        actor(props.getProducingActorId()).
-                        requestId(command.getRequestId()).
-                        key(command.getCpr()).
-                        object(businessObject).
-                        build();
-        aggregateLifecycle.apply(businessEvent);
+    @CommandHandler(createsAggregate = true)
+    public KlientOprettetObject opretKlient(MessageContext context, OpretKlientCommand command) throws Exception {
+        return KlientOprettetObject.builder().
+                cpr(command.getCpr()).
+                efternavn(command.getEfternavn()).
+                fornavn(command.getFornavn()).
+                build();
     }
 ```
 
 En event sourcing handler skabes tilsvarende:
 
 ```
-@EventSourcingHandler
-public void onKlientRettetEvent(BusinessEvent<KlientRettetObject> event) throws Exception{
-KlientRettetObject klient = event.getObject();
-fornavn = klient.getFornavn();
-efternavn = klient.getEfternavn();
-cpr = klient.getCpr();
-version = event.getVersion();
-log.info("Klient rettet i writemodel");
-}
+    @EventSourcingHandler
+    public void onKlientOprettetEvent(MessageContext context, KlientOprettetObject event) throws Exception {
+        fornavn = event.getFornavn();
+        efternavn = event.getEfternavn();
+        cpr = event.getCpr();
+        version = context.getVersion();
+        log.info("Klient oprettet i writemodel");
+    }
+
 ```
 
 Det skal bemærkes, at et Event Sourcing handler ALTID modtager objekter af "BusinessEvent-typen". Det der adskiller den
@@ -117,13 +111,12 @@ er dette object af typen "KlientRettetObject".
 En eventhandler implementeres i analogi med en eventsourcing-handler således:
 
 ```
-@EventHandler
-public void onKlientOprettetEvent(BusinessEvent<KlientOprettetObject> event) throws Exception {
-        KlientOprettetObject klient = event.getObject();
-        opretKlient(klient, event.getVersion());
-        log.info("Klient oprettet i read-model");
-        }
-}
+    @EventHandler
+    @Transactional
+    public void onKlientRettetEvent(MessageContext context, KlientRettetObject event) throws Exception {
+        retKlient(event, context.getVersion());
+        log.info("Klient rettet i read-model");
+    }
 ```
 
 ### Event Sourcing- og Events Handlers - sourcing ved initialisering

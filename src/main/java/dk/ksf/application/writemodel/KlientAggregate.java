@@ -5,7 +5,7 @@ import dk.ksf.application.common.eventobjects.KlientOprettetObject;
 import dk.ksf.application.common.eventobjects.KlientRettetObject;
 import dk.ksf.application.writemodel.commands.OpretKlientCommand;
 import dk.ksf.application.writemodel.commands.RetKlientCommand;
-import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.internalmessages.MessageContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
@@ -33,7 +33,7 @@ public class KlientAggregate {
     AggregateLifecycle aggregateLifecycle;
 
     @CommandHandler(createsAggregate = true)
-    public KlientOprettetObject opretKlient(CqrsContext context, OpretKlientCommand command) throws Exception {
+    public KlientOprettetObject opretKlient(MessageContext context, OpretKlientCommand command) throws Exception {
         return KlientOprettetObject.builder().
                 cpr(command.getCpr()).
                 efternavn(command.getEfternavn()).
@@ -42,7 +42,7 @@ public class KlientAggregate {
     }
 
     @EventSourcingHandler
-    public void onKlientOprettetEvent(CqrsContext context, KlientOprettetObject event) throws Exception {
+    public void onKlientOprettetEvent(MessageContext context, KlientOprettetObject event) throws Exception {
         fornavn = event.getFornavn();
         efternavn = event.getEfternavn();
         cpr = event.getCpr();
@@ -51,12 +51,12 @@ public class KlientAggregate {
     }
 
     @CommandHandler
-    public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand command) throws Exception {
+    public KlientRettetObject onRetKlientCommand(MessageContext context, RetKlientCommand command) throws Exception {
         return KlientRettetObject.builder().cpr(command.getCpr()).efternavn(command.getEfternavn()).fornavn(command.getFornavn()).build();
     }
 
     @EventSourcingHandler
-    public void onKlientRettetEvent(CqrsContext context, KlientRettetObject event) throws Exception {
+    public void onKlientRettetEvent(MessageContext context, KlientRettetObject event) throws Exception {
         fornavn = event.getFornavn();
         efternavn = event.getEfternavn();
         cpr = event.getCpr();

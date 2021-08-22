@@ -5,8 +5,7 @@ import dk.ksf.application.common.eventobjects.KlientRettetObject;
 import dk.ksf.application.writemodel.commands.OpretKlientCommand;
 import dk.ksf.application.writemodel.commands.RetKlientCommand;
 import dk.ksf.cqrs.CqrsProperties;
-import dk.ksf.cqrs.events.BusinessEventFactory;
-import dk.ksf.cqrs.events.CqrsContext;
+import dk.ksf.cqrs.events.model.BusinessEventFactory;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
@@ -37,9 +36,9 @@ public class TestEventDispatcher {
     @Mock
     AutowireCapableBeanFactory factory;
     CqrsMetaInfo metaInfo;
-    AllCqrsAnnotationsHandler annotationsHandler;
+    AllExecutablesContainer annotationsHandler;
     BusinessEventFactory beFactory;
-    CqrsContext context;
+    MessageContext context;
     @Mock
     EventService eventService;
     @AggregateIdentifier
@@ -55,10 +54,10 @@ public class TestEventDispatcher {
         cqrsProperties.setEventobjectsPackage("dk.ksf.application.common.eventobjects");
         metaInfo = new CqrsMetaInfo(cqrsProperties);
         metaInfo.initEventsList();
-        context = CqrsContext.builder().requestId("TestClientAggregate").build();
+        context = MessageContext.builder().requestId("TestClientAggregate").build();
         beFactory = new BusinessEventFactory(cqrsProperties, metaInfo);
         Mockito.when(factory.getBean(TestKlientAggregateRepository.class)).thenReturn(repository);
-        annotationsHandler = new AllCqrsAnnotationsHandler(factory, metaInfo, eventService);
+        annotationsHandler = new AllExecutablesContainer(factory, metaInfo, eventService);
         annotationsHandler.scanClassForHandlerContainers(this.getClass());
         annotationsHandler.scanHandlerContainersForHandlers();
         dispatcher = new EventDispatcher(annotationsHandler);
@@ -119,26 +118,26 @@ public class TestEventDispatcher {
 
 
     @CommandHandler(createsAggregate = true)
-    public void onOpretKlientCommand(CqrsContext context, OpretKlientCommand opretklientData) {
+    public void onOpretKlientCommand(MessageContext context, OpretKlientCommand opretklientData) {
         fornavn = opretklientData.getFornavn();
         efternavn = opretklientData.getEfternavn();
         repository.save(this);
     }
 
     @CommandHandler
-    public KlientRettetObject onRetKlientCommand(CqrsContext context, RetKlientCommand data) throws Exception {
+    public KlientRettetObject onRetKlientCommand(MessageContext context, RetKlientCommand data) throws Exception {
         return KlientRettetObject.builder().cpr(this.id).efternavn(data.getEfternavn()).fornavn(data.getFornavn()).build();
         //return beFactory.createBusinessEvent(this,context,businessObject);
     }
 
     @EventSourcingHandler
-    public void updateOnKlientRettet(CqrsContext context, KlientRettetObject event) {
+    public void updateOnKlientRettet(MessageContext context, KlientRettetObject event) {
         this.fornavn = event.getFornavn();
         this.efternavn = event.getEfternavn();
     }
 
     @EventSourcingHandler
-    public void updateOnKlientOpRettet(CqrsContext context, KlientOprettetObject event) {
+    public void updateOnKlientOpRettet(MessageContext context, KlientOprettetObject event) {
         this.fornavn = event.getFornavn();
         this.efternavn = event.getEfternavn();
     }

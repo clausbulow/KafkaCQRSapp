@@ -1,7 +1,6 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.CqrsProperties;
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.TestBusinessObject1;
@@ -58,18 +57,18 @@ public class AggregateCrqsAnnotationHandlerTest {
     @Test
     public void testOnlyOneHandlerCalled() throws Exception {
         TestBusinessObject1 bo = new TestBusinessObject1("id", "Test1");
-        aggregateCrqsAnnotationHandler.signalEventHandlers(CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
+        aggregateCrqsAnnotationHandler.signalEventHandlers(MessageContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build(), bo);
 
         // Assert.assertEquals(1, target.getCounter());
     }
 
     @Test
     public void testCommandHandler() throws Exception {
-        CqrsContext cqrsContext = CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build();
+        MessageContext messageContext = MessageContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build();
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext, command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1);
         TestKlientAggregate testAggregate1 = repository.findById("key").get();
         Assert.assertEquals(testAggregate1.getLastAction(), "s1");
 
@@ -77,11 +76,11 @@ public class AggregateCrqsAnnotationHandlerTest {
 
     @Test
     public void testEventSourcingHandler() throws Exception {
-        CqrsContext cqrsContext = CqrsContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build();
+        MessageContext messageContext = MessageContext.builder().requestId("AggregateCqrsAnnotationHanlderTest").build();
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(cqrsContext, command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1);
         Optional<TestKlientAggregate> optionalTestAggregate1 = repository.findById("key");
         Assert.assertNotNull(optionalTestAggregate1.get());
         TestKlientAggregate testAggregate1 = optionalTestAggregate1.get();

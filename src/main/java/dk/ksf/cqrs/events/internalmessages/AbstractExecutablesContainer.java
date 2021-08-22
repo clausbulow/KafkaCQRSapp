@@ -1,11 +1,11 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.cqrs.exceptions.ExceptionConsumer;
+import dk.ksf.cqrs.exceptions.MessageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
@@ -55,15 +55,15 @@ public abstract class AbstractExecutablesContainer {
 
     private void createHandlerExecutor(Method method, Annotation annotation, Class annotationClass, AutowireCapableBeanFactory factory) throws Exception {
         //Assert that BusinessEvent and command handler is last param
-        ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount() - 1);
-        AbstractExecutor executor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
+        final ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount() - 1);
+        final AbstractExecutor executor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
                 method(method).
                 targetType(targetType).
                 annotationClass(annotationClass).
                 factory(factory).
                 owner(this).
                 annotation(annotation).build());
-        List<AbstractExecutor> executors;
+        final List<AbstractExecutor> executors;
         if (!handlerExecutors.containsKey(annotationClass)) {
             executors = new ArrayList<>();
             handlerExecutors.put(annotationClass, executors);
@@ -96,8 +96,8 @@ public abstract class AbstractExecutablesContainer {
     }
 
 
-    public void signalCommandHandlers(CqrsContext context, Object command) throws Exception {
-        List<AbstractExecutor> commandExecutors = getCommandExecutors();
+    public void signalCommandHandlers(MessageContext context, Object command) throws Exception {
+        final List<AbstractExecutor> commandExecutors = getCommandExecutors();
         context.setKey((String) metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
         commandExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
             if (!executor.supports(command)) {
@@ -110,9 +110,12 @@ public abstract class AbstractExecutablesContainer {
                 beanFactory.autowireBean(target);
             } else {
                 target = getTargetInstance(context, command, context.getKey());
+                if (target == null){
+                    throw new MessageException("Cannot excecute command, because item "+context.getKey() + " in class "+this.containerClass + " can not be found");
+                }
             }
             context.setTargetInstance(target);
-            Object commandResult = executor.execute(context, command);
+            final Object commandResult = executor.execute(context, command);
             if (commandResult != null) {
                 if (command.getClass().isArray()) {
                     Object[] commandresults = (Object[]) commandResult;
@@ -126,7 +129,7 @@ public abstract class AbstractExecutablesContainer {
     }
 
 
-    private void processSingleCommandResult(CqrsContext context, Object event) throws Exception {
+    private void processSingleCommandResult(MessageContext context, Object event) throws Exception {
         log.info("Processing event produced from commandhandler");
         if (metaInfo.getEventName(event.getClass()) != null) {
             signalEventSourcingHandlers(context, event);
@@ -135,21 +138,21 @@ public abstract class AbstractExecutablesContainer {
 
     }
 
-    protected abstract Object getTargetInstance(CqrsContext context, Object command, String keyRef) throws Exception;
+    protected abstract Object getTargetInstance(MessageContext context, Object command, String keyRef) throws Exception;
 
     protected abstract void setTargetKeyValue(Object target, String keyRef) throws Exception;
 
     protected abstract void save(Object target, String keyRef) throws Exception;
 
 
-    public void signalEventHandlers(CqrsContext context, Object event) {
-        List<AbstractExecutor> eventExecutors = getEventExecutors();
+    public void signalEventHandlers(MessageContext context, Object event) {
+        final List<AbstractExecutor> eventExecutors = getEventExecutors();
         context.setTargetInstance(beanFactory.getBean(this.containerClass));
         eventExecutors.forEach(ExceptionConsumer.wrapper(excecutor -> excecutor.execute(context, event)));
     }
 
-    public void signalEventSourcingHandlers(CqrsContext context, Object event) throws Exception {
-        List<AbstractExecutor> eventSourcingExecutors = getEventSourcingExecutors();
+    public void signalEventSourcingHandlers(MessageContext context, Object event) throws Exception {
+        final List<AbstractExecutor> eventSourcingExecutors = getEventSourcingExecutors();
         context.setKey((String) metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
 
         eventSourcingExecutors.forEach(ExceptionConsumer.wrapper(executor -> {

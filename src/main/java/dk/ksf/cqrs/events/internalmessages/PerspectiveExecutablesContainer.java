@@ -1,6 +1,5 @@
 package dk.ksf.cqrs.events.internalmessages;
 
-import dk.ksf.cqrs.events.CqrsContext;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.service.EventService;
@@ -30,7 +29,7 @@ public class PerspectiveExecutablesContainer extends AbstractExecutablesContaine
     }
 
     @Override
-    protected Object getTargetInstance(CqrsContext context, Object command, String keyRef) throws Exception {
+    protected Object getTargetInstance(MessageContext context, Object command, String keyRef) throws Exception {
         return beanFactory.getBean(getContainerClass());
     }
 

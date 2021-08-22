@@ -3,7 +3,7 @@ package dk.ksf.cqrs.events.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dk.ksf.cqrs.events.internalmessages.AllCqrsAnnotationsHandler;
+import dk.ksf.cqrs.events.internalmessages.AllExecutablesContainer;
 import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.*;
@@ -36,7 +36,7 @@ public class EventStore2EventSourceProcessor {
     EventDispatcher dispatcher;
 
     @Autowired
-    AllCqrsAnnotationsHandler cqrsAnnotationsHandler;
+    AllExecutablesContainer cqrsAnnotationsHandler;
 
     public List<JsonNode> execute(AggregateTypes aggregateType) {
         final List<JsonNode> result = new ArrayList<>();

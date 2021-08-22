@@ -3,22 +3,48 @@
 
 autonumber
 
-Participant quyery as "Query Model" << BusinessApplication >>
-Participant aggregate as "Aggregate" << BusinessApplication >>
-Participant lifeCycleHanlder as "LifeCyckleHandler" << BusinessApplication >>
-Participant localDBWrite as "LocalDB" << BusinessApplication >>
-Participant stateStore as "StateStore" << BusinessApplication >>
+Participant controller as "Command Controller" << BusinessApplication >>
+Participant eventHandler as "EventHandler" << Common Code >>
+Participant aggregateInstance as "Aggregate" << BusinessApplication >>
+Participant aggregaterepository as "AggregateRepository" <<BusinessApplication>>
+Participant localDBWrite as "LocalDB" << Common Code  >>
+Participant eventStoreRepository as "Eventstore Repository" <<Common Code>>
+Participant stateStore as "StateStore" <<Common Code>>
+Participant kafka as "Kafka" <<Infrastructure>>
+Participant kafkaConsumer as "Kafka Consumer" <<Common Code>>
 Participant perspective as "Perspective" << BusinessApplication >>
+Participant perspectiveRepository as "PerspectiveRepository"<< BusinessApplication >>
 Participant localDBRead as "LocalDB" << BusinessApplication >>
 
-quyery -> aggregate: CommandHandler(command)
-aggregate -> aggregate: Verify Command
-aggregate -> lifeCycleHanlder: Apply BusinessEvent
-lifeCycleHanlder -> aggregate: EvenSourcingHandler (BusinessEvent)
-aggregate -> localDBWrite: update Write-Model
-lifeCycleHanlder -> stateStore: fireEvent(BusinessEvent)
-stateStore --> perspective: EventHandler(BusinessEvent)
-perspective -> localDBRead: update Read-Model
+
+controller -> eventHandler: CommandHandler(command): BusinessEvent
+eventHandler -> eventHandler: findCommandHandler
+eventHandler -> aggregaterepository: findAggregateInstance
+aggregaterepository -> localDBWrite: aggregateInstance
+localDBWrite -> aggregaterepository: aggregateInstance
+aggregaterepository -> eventHandler: aggregateInstance
+eventHandler -> aggregateInstance: invokeCommandHandler(command)
+
+aggregateInstance -> aggregateInstance: Verify Command
+aggregateInstance -> eventHandler: return businessEvents
+loop for each returned businessEvent
+  eventHandler -> eventHandler: findEventsourcingHandler
+  eventHandler -> aggregateInstance: invokeEventSourcingHandler(businessEvent)
+  aggregateInstance -> aggregateInstance: updateAggregateState(businessEvent)
+  eventHandler -> eventHandler: beginTransaction
+  eventHandler -> aggregaterepository: save(aggregateInstance)
+  aggregaterepository -> localDBWrite: save(aggregateInstance)
+  eventHandler -> eventStoreRepository: saveBusinessEvent(businessEvent)
+  eventStoreRepository -> stateStore: saveBusinessEvent(businessEvent)
+  eventHandler -> eventHandler: endTransaction
+  stateStore -->kafka: distributeBusinessEvent(businessEvent)
+  kafka -->kafkaConsumer: recieveEvent(businessEvent)
+  kafkaConsumer->eventHandler: signalBusinessEvent(businessEvent)
+  eventHandler->eventHandler: findEventHandler(BusinessEvent)
+  eventHandler->perspective: invokeEventHandler(BusinessEvent)
+  perspective-> perspectiveRepository: updateReadModel(businessEvent)
+  perspectiveRepository->localDBRead: updateReadModel(businessEvent)
+end
 
 
 
