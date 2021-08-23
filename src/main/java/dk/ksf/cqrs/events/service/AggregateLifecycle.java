@@ -12,10 +12,4 @@ public class AggregateLifecycle {
     EventDispatcher eventDispatcher;
     @Autowired
     EventService eventService;
-
-    @Transactional(transactionManager = "eventstoreTransactionManager")
-    public void apply(Object creator, MessageContext context, Object businessEvent) throws Exception {
-        eventDispatcher.publishEventToEventSourcing(context, businessEvent);
-        eventService.fireEvent(creator, context, businessEvent);
-    }
 }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -96,7 +97,7 @@ public abstract class AbstractExecutablesContainer {
     }
 
 
-    public void signalCommandHandlers(MessageContext context, Object command) throws Exception {
+    public void signalCommandHandlers(MessageContext context, Object command, TransactionTemplate transactionTemplate) throws Exception {
         final List<AbstractExecutor> commandExecutors = getCommandExecutors();
         context.setKey((String) metaInfo.getAggregateIdentifierFromClass(command.getClass()).get(command));
         commandExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
@@ -119,21 +120,26 @@ public abstract class AbstractExecutablesContainer {
             if (commandResult != null) {
                 if (command.getClass().isArray()) {
                     Object[] commandresults = (Object[]) commandResult;
-                    Arrays.asList(commandresults).forEach(ExceptionConsumer.wrapper(result -> processSingleCommandResult(context, result)));
+                    Arrays.asList(commandresults).forEach(ExceptionConsumer.wrapper(result -> processSingleCommandResult(context, result, transactionTemplate)));
                 }
                 {
-                    processSingleCommandResult(context, commandResult);
+                    processSingleCommandResult(context, commandResult, transactionTemplate);
                 }
             }
         }));
     }
 
 
-    private void processSingleCommandResult(MessageContext context, Object event) throws Exception {
+    private void processSingleCommandResult(MessageContext context, Object event, TransactionTemplate transactionTemplate) throws Exception {
         log.info("Processing event produced from commandhandler");
         if (metaInfo.getEventName(event.getClass()) != null) {
-            signalEventSourcingHandlers(context, event);
-            eventService.fireEvent(context.getTargetInstance(), context, event);
+            transactionTemplate.executeWithoutResult( t -> {
+                try {
+                    signalEventSourcingHandlers(context, event);
+                    eventService.fireEvent(context.getTargetInstance(), context, event);
+                } catch (Exception e){
+                    t.setRollbackOnly();                }
+            });
         }
 
     }

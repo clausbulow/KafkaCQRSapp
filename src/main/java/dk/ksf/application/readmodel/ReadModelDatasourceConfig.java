@@ -25,7 +25,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         basePackages = "dk.ksf.application.readmodel",
         entityManagerFactoryRef = "readstoreEntityManager",
-        transactionManagerRef = "readstoreTranationManager")
+        transactionManagerRef = "readstoreTransactionManager")
 public class ReadModelDatasourceConfig {
     @Primary
     @Bean("readstoreProps")
@@ -42,7 +42,7 @@ public class ReadModelDatasourceConfig {
 
 
     @Primary
-    @Bean("readstoreTranationManager")
+    @Bean("readstoreTransactionManager")
     PlatformTransactionManager readstoreTransactionManager(@Qualifier("readstoreEntityManager") LocalContainerEntityManagerFactoryBean entityManagerFactoryBean) {
         return new JpaTransactionManager(entityManagerFactoryBean.getObject());
     }

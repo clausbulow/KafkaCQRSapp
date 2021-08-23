@@ -11,11 +11,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Optional;
 
@@ -24,18 +30,30 @@ public class AggregateCrqsAnnotationHandlerTest {
     final TestRepository repository = new TestRepository();
     private final TestKlientAggregate target = new TestKlientAggregate();
     AggregateExecutablesContainer aggregateCrqsAnnotationHandler;
-    @Mock
-    AutowireCapableBeanFactory factory;
     CqrsMetaInfo metaInfo;
+    private Object AllCqrsAnnotationsHandler;
+
     Aggregate annotation;
     @Mock
     EventService eventService;
-    private Object AllCqrsAnnotationsHandler;
+
+    @Mock
+    AutowireCapableBeanFactory factory;
+
+    @Mock
+    TransactionTemplate transactionTemplate;
+    @Mock
+    TransactionStatus transactionStatus;
+    @Mock
+    PlatformTransactionManager transactionManager;
+
 
     @Before
     public void before() throws Exception {
         CqrsProperties props = new CqrsProperties();
         props.setEventobjectsPackage("dk.ksf.testclasses");
+        transactionTemplate = new TransactionTemplate(transactionManager);
+        Mockito.when(transactionManager.getTransaction(ArgumentMatchers.any())).thenReturn(transactionStatus);
         metaInfo = new CqrsMetaInfo(props);
         metaInfo.initEventsList();
         Mockito.when(factory.getBean(TestKlientAggregate.class)).thenReturn(new TestKlientAggregate());
@@ -49,8 +67,6 @@ public class AggregateCrqsAnnotationHandlerTest {
 
     @Test
     public void testHandlersFound() throws Exception {
-
-
         Assert.assertEquals(2, aggregateCrqsAnnotationHandler.getEventExecutors().size());
     }
 
@@ -68,7 +84,7 @@ public class AggregateCrqsAnnotationHandlerTest {
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1,transactionTemplate );
         TestKlientAggregate testAggregate1 = repository.findById("key").get();
         Assert.assertEquals(testAggregate1.getLastAction(), "s1");
 
@@ -80,7 +96,7 @@ public class AggregateCrqsAnnotationHandlerTest {
         TestCommand1 command1 = new TestCommand1();
         command1.key = "key";
         command1.value = "value1";
-        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1);
+        aggregateCrqsAnnotationHandler.signalCommandHandlers(messageContext, command1, transactionTemplate);
         Optional<TestKlientAggregate> optionalTestAggregate1 = repository.findById("key");
         Assert.assertNotNull(optionalTestAggregate1.get());
         TestKlientAggregate testAggregate1 = optionalTestAggregate1.get();

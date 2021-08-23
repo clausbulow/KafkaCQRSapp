@@ -5,11 +5,15 @@ import dk.ksf.cqrs.events.annotations.Perspective;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.cqrs.exceptions.ExceptionConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,13 +27,17 @@ public class AllExecutablesContainer {
     private final AutowireCapableBeanFactory factory;
     private final CqrsMetaInfo metaInfo;
     private final EventService eventService;
+
+    PlatformTransactionManager transactionManager;
+
     private final List<Class> classAnnotationsOfInterest = Arrays.asList(
             Aggregate.class, Perspective.class
     );
-    public AllExecutablesContainer(AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo, EventService eventService) {
+    public AllExecutablesContainer(AutowireCapableBeanFactory factory, CqrsMetaInfo metaInfo, EventService eventService, @Qualifier("eventstoreTransactionManager") PlatformTransactionManager transactionManager) {
         this.factory = factory;
         this.metaInfo = metaInfo;
         this.eventService = eventService;
+        this.transactionManager = transactionManager;
     }
 
     public void scanForClassAnnotation(String basePackage) throws Exception {
@@ -76,7 +84,8 @@ public class AllExecutablesContainer {
     }
 
     public void signalCommandHandlers(MessageContext context, Object command) throws Exception {
-        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalCommandHandlers(context, command)));
+        TransactionTemplate transactionTemplate = new TransactionTemplate(this.transactionManager);
+        abstractExecutablesContainers.forEach(ExceptionConsumer.wrapper(container -> container.signalCommandHandlers(context, command, transactionTemplate)));
     }
 
 

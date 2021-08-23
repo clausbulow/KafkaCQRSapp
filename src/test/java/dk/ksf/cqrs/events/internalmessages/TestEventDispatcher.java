@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Optional;
 
@@ -35,6 +36,10 @@ public class TestEventDispatcher {
     EventDispatcher dispatcher;
     @Mock
     AutowireCapableBeanFactory factory;
+
+    @Mock
+    PlatformTransactionManager transactionManager;
+
     CqrsMetaInfo metaInfo;
     AllExecutablesContainer annotationsHandler;
     BusinessEventFactory beFactory;
@@ -57,7 +62,7 @@ public class TestEventDispatcher {
         context = MessageContext.builder().requestId("TestClientAggregate").build();
         beFactory = new BusinessEventFactory(cqrsProperties, metaInfo);
         Mockito.when(factory.getBean(TestKlientAggregateRepository.class)).thenReturn(repository);
-        annotationsHandler = new AllExecutablesContainer(factory, metaInfo, eventService);
+        annotationsHandler = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
         annotationsHandler.scanClassForHandlerContainers(this.getClass());
         annotationsHandler.scanHandlerContainersForHandlers();
         dispatcher = new EventDispatcher(annotationsHandler);

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,6 +25,9 @@ public class AllExecutablesContainerTest {
 
     @Mock
     EventService eventService;
+
+    @Mock
+    PlatformTransactionManager transactionManager;
 
     @Before
     public void before() throws Exception {
@@ -39,7 +43,7 @@ public class AllExecutablesContainerTest {
 
     @Test
     public void testScanForClassAnnotationsFindsOne() throws Exception {
-        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService);
+        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
         allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
         assertEquals(2, allExecutablesContainer.getHandlerContainers().size());
     }
@@ -48,7 +52,7 @@ public class AllExecutablesContainerTest {
     public void testScanForClassAnnotations2AreCalled() throws Exception {
         TestPerspective1 p = new TestPerspective1();
         Mockito.when(factory.getBean(TestPerspective1.class)).thenReturn(p);
-        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService);
+        AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
         allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
 
         TestBusinessObject1 bo = new TestBusinessObject1("key", "Test1");
