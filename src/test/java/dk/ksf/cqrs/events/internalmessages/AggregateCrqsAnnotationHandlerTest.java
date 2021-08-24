@@ -2,6 +2,7 @@ package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.annotations.Aggregate;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.TestBusinessObject1;
 import dk.ksf.testclasses.TestCommand1;
@@ -11,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,7 +19,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -55,19 +54,19 @@ public class AggregateCrqsAnnotationHandlerTest {
         transactionTemplate = new TransactionTemplate(transactionManager);
         Mockito.when(transactionManager.getTransaction(ArgumentMatchers.any())).thenReturn(transactionStatus);
         metaInfo = new CqrsMetaInfo(props);
-        metaInfo.initEventsList();
+        metaInfo.init();
         Mockito.when(factory.getBean(TestKlientAggregate.class)).thenReturn(new TestKlientAggregate());
         Mockito.when(factory.getBean(TestRepository.class)).thenReturn(repository);
         annotation = AnnotationUtils.findAnnotation(TestKlientAggregate.class, Aggregate.class);
 
-        aggregateCrqsAnnotationHandler = new AggregateExecutablesContainer(annotation, TestKlientAggregate.class, factory, metaInfo, eventService);
+        aggregateCrqsAnnotationHandler = new AggregateExecutablesContainer(TestKlientAggregate.class, factory, metaInfo, eventService);
         aggregateCrqsAnnotationHandler.scanForAnnotations();
     }
 
 
     @Test
     public void testHandlersFound() throws Exception {
-        Assert.assertEquals(2, aggregateCrqsAnnotationHandler.getEventExecutors().size());
+        Assert.assertEquals(4, aggregateCrqsAnnotationHandler.getEventExecutors().size());
     }
 
     @Test

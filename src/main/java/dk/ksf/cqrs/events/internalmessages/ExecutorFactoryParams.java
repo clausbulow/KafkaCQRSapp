@@ -14,7 +14,6 @@ public class ExecutorFactoryParams {
     Method method;
     ResolvableType targetType;
     Annotation annotation;
-    Class annotationClass;
     AutowireCapableBeanFactory factory;
     AbstractExecutablesContainer owner;
 }

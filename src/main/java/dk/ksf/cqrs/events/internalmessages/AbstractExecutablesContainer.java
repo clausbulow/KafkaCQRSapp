@@ -3,15 +3,14 @@ package dk.ksf.cqrs.events.internalmessages;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.cqrs.exceptions.ExceptionConsumer;
 import dk.ksf.cqrs.exceptions.MessageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -23,53 +22,36 @@ public abstract class AbstractExecutablesContainer {
     private final CqrsMetaInfo metaInfo;
     private final EventService eventService;
     private final Map<Class, List<AbstractExecutor>> handlerExecutors = new HashMap<>();
-    private final Class containerClass;
     private final ExectutorFactory exectutorFactory;
+    private final Class containerClass;
 
     public AbstractExecutablesContainer(Class containerClass, AutowireCapableBeanFactory beanFactory, CqrsMetaInfo metaInfo, EventService eventService) {
-        this.containerClass = containerClass;
         this.beanFactory = beanFactory;
         this.metaInfo = metaInfo;
         this.exectutorFactory = new ExectutorFactory(metaInfo);
         this.eventService = eventService;
+        this.containerClass = containerClass;
 
     }
 
-    public abstract List<Class> memberAnnotationsOfInterest();
 
-    public Class getContainerClass() {
-        return containerClass;
-    }
 
-    void scanForAnnotations() {
-
-        ReflectionUtils.doWithMethods(containerClass, method -> {
-            List<Class> classes = memberAnnotationsOfInterest();
-            classes.forEach(ExceptionConsumer.wrapper(annotationClass -> {
-                Annotation annotation = AnnotationUtils.findAnnotation(method, annotationClass);
-                if (annotation != null) {
-                    createHandlerExecutor(method, annotation, annotationClass, beanFactory);
-                }
-            }));
-        });
-    }
-
-    private void createHandlerExecutor(Method method, Annotation annotation, Class annotationClass, AutowireCapableBeanFactory factory) throws Exception {
+    protected void createHandlerExecutor(Class handlerType, Method method, Annotation annotation, AutowireCapableBeanFactory factory) throws Exception {
         //Assert that BusinessEvent and command handler is last param
         final ResolvableType targetType = ResolvableType.forMethodParameter(method, method.getParameterCount() - 1);
         final AbstractExecutor executor = exectutorFactory.createHandlerExecutor(ExecutorFactoryParams.builder().
                 method(method).
                 targetType(targetType).
-                annotationClass(annotationClass).
                 factory(factory).
                 owner(this).
                 annotation(annotation).build());
         final List<AbstractExecutor> executors;
-        if (!handlerExecutors.containsKey(annotationClass)) {
+
+        if (!handlerExecutors.containsKey(annotation.annotationType())) {
             executors = new ArrayList<>();
-            handlerExecutors.put(annotationClass, executors);
+            handlerExecutors.put(annotation.annotationType(), executors);
         } else {
-            executors = handlerExecutors.get(annotationClass);
+            executors = handlerExecutors.get(annotation.annotationType());
         }
         executors.add(executor);
     }
@@ -181,5 +163,11 @@ public abstract class AbstractExecutablesContainer {
         }));
     }
 
+    public CqrsMetaInfo getMetaInfo() {
+        return metaInfo;
+    }
 
+    public Class getContainerClass() {
+        return containerClass;
+    }
 }

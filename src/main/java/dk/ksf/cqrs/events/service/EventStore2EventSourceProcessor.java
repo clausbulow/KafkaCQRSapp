@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dk.ksf.cqrs.events.internalmessages.AllExecutablesContainer;
-import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.events.internalmessages.EventDispatcher;
 import dk.ksf.cqrs.events.model.*;
 import lombok.extern.slf4j.Slf4j;
@@ -80,8 +80,11 @@ public class EventStore2EventSourceProcessor {
     @EventListener
     @Order(10)
     public void initRepo(ContextRefreshedEvent event) throws Exception {
-        cqrsAnnotationsHandler.initEventsList();
+        //First initialize messaging system
+        metaInfo.init();
+        cqrsAnnotationsHandler.init();
 
+        //Then throw events for event-sourcing
         final Collection<AggregateTypes> initializeFromAggregates = metaInfo.getAggregatesSupportedInApplication();
         initializeFromAggregates.forEach(aggregateType -> execute(aggregateType).forEach(eventStoreItem -> {
                     try {

@@ -1,6 +1,7 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.TestBusinessObject1;
 import dk.ksf.testclasses.TestKlientAggregate;
@@ -34,7 +35,7 @@ public class AllExecutablesContainerTest {
         CqrsProperties props = new CqrsProperties();
         props.setEventobjectsPackage("dk.ksf.testclasses");
         metaInfo = new CqrsMetaInfo(props);
-        metaInfo.initEventsList();
+        metaInfo.init();
         Mockito.when(factory.getBean(TestKlientAggregate.class)).thenReturn(new TestKlientAggregate());
         TestKlientAggregate a = new TestKlientAggregate();
         Mockito.when(factory.getBean(TestKlientAggregate.class)).thenReturn(a);
@@ -44,7 +45,7 @@ public class AllExecutablesContainerTest {
     @Test
     public void testScanForClassAnnotationsFindsOne() throws Exception {
         AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
-        allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
+        allExecutablesContainer.init();
         assertEquals(2, allExecutablesContainer.getHandlerContainers().size());
     }
 
@@ -53,7 +54,7 @@ public class AllExecutablesContainerTest {
         TestPerspective1 p = new TestPerspective1();
         Mockito.when(factory.getBean(TestPerspective1.class)).thenReturn(p);
         AllExecutablesContainer allExecutablesContainer = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
-        allExecutablesContainer.scanForClassAnnotation("dk.ksf.testclasses");
+        allExecutablesContainer.init();
 
         TestBusinessObject1 bo = new TestBusinessObject1("key", "Test1");
 

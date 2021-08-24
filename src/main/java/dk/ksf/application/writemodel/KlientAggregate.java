@@ -25,15 +25,15 @@ public class KlientAggregate {
 
     @AggregateIdentifier
     String cpr;
+
     String fornavn;
     String efternavn;
     long version;
 
-    @Autowired
-    AggregateLifecycle aggregateLifecycle;
 
     @CommandHandler(createsAggregate = true)
     public KlientOprettetObject opretKlient(MessageContext context, OpretKlientCommand command) throws Exception {
+        //Validate command if necessary
         return KlientOprettetObject.builder().
                 cpr(command.getCpr()).
                 efternavn(command.getEfternavn()).

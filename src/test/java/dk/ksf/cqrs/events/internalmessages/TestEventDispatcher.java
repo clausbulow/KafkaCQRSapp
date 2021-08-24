@@ -1,10 +1,8 @@
 package dk.ksf.cqrs.events.internalmessages;
 
 import dk.ksf.application.common.eventobjects.KlientOprettetObject;
-import dk.ksf.application.common.eventobjects.KlientRettetObject;
-import dk.ksf.application.writemodel.commands.OpretKlientCommand;
-import dk.ksf.application.writemodel.commands.RetKlientCommand;
 import dk.ksf.cqrs.CqrsProperties;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.events.model.BusinessEventFactory;
 import dk.ksf.cqrs.events.annotations.Aggregate;
 import dk.ksf.cqrs.events.annotations.AggregateIdentifier;
@@ -13,6 +11,9 @@ import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
 import dk.ksf.cqrs.events.model.AggregateTypes;
 import dk.ksf.cqrs.events.service.EventService;
 import dk.ksf.testclasses.TestKlientAggregateRepository;
+import dk.ksf.testclasses.commands.OpretKlientCommand;
+import dk.ksf.testclasses.commands.RetKlientCommand;
+import dk.ksf.testclasses.eventobjects.KlientRettetObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,15 +57,15 @@ public class TestEventDispatcher {
     public void before() throws Exception {
         CqrsProperties cqrsProperties = new CqrsProperties();
         cqrsProperties.setProducingActorId("AggregateTest");
-        cqrsProperties.setEventobjectsPackage("dk.ksf.application.common.eventobjects");
+        cqrsProperties.setEventobjectsPackage("dk.ksf");
         metaInfo = new CqrsMetaInfo(cqrsProperties);
-        metaInfo.initEventsList();
+        metaInfo.init();
         context = MessageContext.builder().requestId("TestClientAggregate").build();
         beFactory = new BusinessEventFactory(cqrsProperties, metaInfo);
         Mockito.when(factory.getBean(TestKlientAggregateRepository.class)).thenReturn(repository);
         annotationsHandler = new AllExecutablesContainer(factory, metaInfo, eventService, transactionManager);
-        annotationsHandler.scanClassForHandlerContainers(this.getClass());
-        annotationsHandler.scanHandlerContainersForHandlers();
+        annotationsHandler.createExecutableContainers(this.getClass());
+        annotationsHandler.init();
         dispatcher = new EventDispatcher(annotationsHandler);
         // annotationsHandler.registerNewAggregateInstance(this);
 

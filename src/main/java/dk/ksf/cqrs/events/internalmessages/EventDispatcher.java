@@ -8,23 +8,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EventDispatcher {
     @Autowired
-    AllExecutablesContainer cqrsHandlers;
+    AllExecutablesContainer executableContainers;
 
-    public EventDispatcher(AllExecutablesContainer cqrsHandlers) {
-        this.cqrsHandlers = cqrsHandlers;
+    public EventDispatcher(AllExecutablesContainer executableContainers) {
+        this.executableContainers = executableContainers;
     }
 
 
     public void publishEventToEventSourcing(MessageContext context, Object event) throws Exception {
-        cqrsHandlers.signalEventSourcingHandlers(context, event);
+        executableContainers.signalEventSourcingHandlers(context, event);
     }
 
     public void publishEventToEventHandlers(MessageContext context, Object event) throws Exception {
-        cqrsHandlers.signalEventHandlers(context, event);
+        executableContainers.signalEventHandlers(context, event);
     }
 
     public void publishCommand(MessageContext context, Object command) throws Exception {
-        cqrsHandlers.signalCommandHandlers(context, command);
+        executableContainers.signalCommandHandlers(context, command);
     }
 
 

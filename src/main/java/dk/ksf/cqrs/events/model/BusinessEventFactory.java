@@ -2,7 +2,7 @@ package dk.ksf.cqrs.events.model;
 
 import dk.ksf.cqrs.CqrsProperties;
 import dk.ksf.cqrs.events.internalmessages.MessageContext;
-import dk.ksf.cqrs.events.internalmessages.CqrsMetaInfo;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

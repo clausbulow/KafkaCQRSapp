@@ -3,8 +3,11 @@ package dk.ksf.cqrs.events.internalmessages;
 import dk.ksf.cqrs.events.annotations.CommandHandler;
 import dk.ksf.cqrs.events.annotations.EventHandler;
 import dk.ksf.cqrs.events.annotations.EventSourcingHandler;
+import dk.ksf.cqrs.events.internalmessages.cqrsscanner.CqrsMetaInfo;
 import dk.ksf.cqrs.exceptions.MessageException;
 import org.springframework.stereotype.Component;
+
+import java.lang.annotation.Annotation;
 
 @Component
 public class ExectutorFactory {
@@ -15,13 +18,15 @@ public class ExectutorFactory {
     }
 
     AbstractExecutor createHandlerExecutor(ExecutorFactoryParams params) throws Exception {
-        if (params.getAnnotationClass() == EventHandler.class) {
+        final Annotation annotation = params.getAnnotation();
+
+        if (annotation instanceof EventHandler) {
             return new EventExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory());
         }
-        if (params.getAnnotationClass() == CommandHandler.class) {
+        if (annotation instanceof CommandHandler) {
             return new CommandExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(), metaInfo);
         }
-        if (params.getAnnotationClass() == EventSourcingHandler.class) {
+        if (annotation instanceof EventSourcingHandler) {
             return new EventSourcingExecutor(params.getOwner(), params.getMethod(), params.getTargetType(), params.getFactory(), metaInfo);
         }
         throw new MessageException("Illegal annotion used... can not create handler-excecutor");
