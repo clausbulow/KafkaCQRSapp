@@ -13,7 +13,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -56,23 +55,25 @@ public class CqrsMetaInfo {
     }
 
     public void init() throws Exception {
-        scanForBusinessObjects(props.getEventobjectsPackage());
-        scanForContainers(props.getEventobjectsPackage());
+        scanForBusinessObjects(props.getEventobjectsPackages());
+        scanForContainers(props.getEventobjectsPackages());
     }
 
-    public void init(String basePackage) throws Exception {
+    public void init(List<String> basePackage) throws Exception {
         scanForBusinessObjects(basePackage);
         scanForContainers(basePackage);
     }
-    public void scanForContainers(String basePackage) throws Exception {
+    public void scanForContainers(List<String> basePackages) throws Exception {
         final ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
         classAnnotationsOfInterest.forEach(clazz -> scanner.addIncludeFilter(new AnnotationTypeFilter(clazz)));
+        basePackages.forEach(ExceptionConsumer.wrapper(basePackage -> {
         final Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(basePackage);
         for (BeanDefinition definition : candidateComponents) {
             Class clazz = Class.forName(definition.getBeanClassName());
             scanContainerForContainerType(clazz);
-        }
+          }
+        }));
         scanContainers();
         log.info("scanning done");
 
@@ -161,21 +162,23 @@ public class CqrsMetaInfo {
     }
 
 
-    private void scanForBusinessObjects(String basePackage) throws Exception {
+    private void scanForBusinessObjects(List<String> basePackages) throws Exception {
         ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
         //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(basePackage);
-        for (BeanDefinition definition : candidateComponents) {
-            System.out.println(definition.getBeanClassName());
-            Class clazz = Class.forName(definition.getBeanClassName());
-            //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
-            BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
-            String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
-            eventNamesToClasses.put(eventName, clazz);
-            eventClassesToNames.put(clazz, eventName);
-        }
+        basePackages.forEach(ExceptionConsumer.wrapper(basePackage -> {
+            Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(basePackage);
+            for (BeanDefinition definition : candidateComponents) {
+                System.out.println(definition.getBeanClassName());
+                Class clazz = Class.forName(definition.getBeanClassName());
+                //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
+                BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
+                String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
+                eventNamesToClasses.put(eventName, clazz);
+                eventClassesToNames.put(clazz, eventName);
+            }
+        }));
     }
 
 

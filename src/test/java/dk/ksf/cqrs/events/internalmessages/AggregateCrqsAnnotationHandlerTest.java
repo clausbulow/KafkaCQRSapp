@@ -22,6 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +51,7 @@ public class AggregateCrqsAnnotationHandlerTest {
     @Before
     public void before() throws Exception {
         CqrsProperties props = new CqrsProperties();
-        props.setEventobjectsPackage("dk.ksf.testclasses");
+        props.setEventobjectsPackages(Arrays.asList("dk.ksf.testclasses"));
         transactionTemplate = new TransactionTemplate(transactionManager);
         Mockito.when(transactionManager.getTransaction(ArgumentMatchers.any())).thenReturn(transactionStatus);
         metaInfo = new CqrsMetaInfo(props);

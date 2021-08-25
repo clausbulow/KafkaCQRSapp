@@ -14,5 +14,6 @@ spring:
 kfs:
   cqrs:
     topicnames: event.dataengineer.inventory.eventstore
-    eventobjectsPackage: dk.ksf.application
+    eventobjectsPackages:
+      - dk.ksf.application
     producingActorId: KS

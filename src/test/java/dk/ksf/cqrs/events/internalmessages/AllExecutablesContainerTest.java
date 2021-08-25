@@ -15,6 +15,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,7 +35,7 @@ public class AllExecutablesContainerTest {
     @Before
     public void before() throws Exception {
         CqrsProperties props = new CqrsProperties();
-        props.setEventobjectsPackage("dk.ksf.testclasses");
+        props.setEventobjectsPackages(Arrays.asList("dk.ksf.testclasses"));
         metaInfo = new CqrsMetaInfo(props);
         metaInfo.init();
         Mockito.when(factory.getBean(TestKlientAggregate.class)).thenReturn(new TestKlientAggregate());

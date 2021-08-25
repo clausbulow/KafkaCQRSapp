@@ -25,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -57,7 +58,7 @@ public class TestEventDispatcher {
     public void before() throws Exception {
         CqrsProperties cqrsProperties = new CqrsProperties();
         cqrsProperties.setProducingActorId("AggregateTest");
-        cqrsProperties.setEventobjectsPackage("dk.ksf");
+        cqrsProperties.setEventobjectsPackages(Arrays.asList(this.getClass().getPackageName(), "dk.ksf.testclasses"));
         metaInfo = new CqrsMetaInfo(cqrsProperties);
         metaInfo.init();
         context = MessageContext.builder().requestId("TestClientAggregate").build();
