@@ -22,11 +22,15 @@ public class EventStoreItem {
             sequenceName = "eventstore_sequencenumber_seq",
             allocationSize = 1)
 
+    @Column(nullable = false)
     String businesskey;
+    @Column(nullable = false)
     String actor;
     String requestId;
     long version;
+    @Column(nullable = false)
     Date created_at;
+    @Column(length = 32000)
     String data;
     @Enumerated(EnumType.STRING)
     private AggregateTypes aggregatetype;

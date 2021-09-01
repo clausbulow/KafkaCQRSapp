@@ -20,21 +20,18 @@ public class KafkaEventHandler {
     @Autowired
     EventProcessor processor;
 
-   // @Autowired
-   // EventValidator validator;
     @Autowired
     EventDispatcher dispatcher;
 
-    @KafkaListener(id = "#{'${spring.application.name}'}", topics = "#{'${kfs.cqrs.topicnames}'}")
+    @KafkaListener(id = "#{'${spring.application.name}'}", topics = "#{'${kfs.cqrs.topicnames}'.split(',')}")
     public void listen(@Payload JsonNode jsonBusinessEvent, @Headers MessageHeaders messageHeaders, Acknowledgment ack) {
         try {
-            //validator.validateEvent(businessEvent);
             ConvertToBusinessEventResponse eventWithContext = processor.converToBusinessEvent(jsonBusinessEvent);
             dispatcher.publishEventToEventHandlers(eventWithContext.getContext(), eventWithContext.getBusinessEvent());
             ack.acknowledge();
         } catch (Exception e) {
             log.error("An error occured while processing message " + e.getMessage());
-            //TODO generic eventhhandlig
+            //TODO generic errorhandling
         }
     }
 

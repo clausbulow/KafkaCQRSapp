@@ -47,8 +47,8 @@ public class CqrsMetaInfo {
     }
 
 
-    public String getEventName(Class<?> klientOprettetObjectClass) {
-        return eventClassesToNames.get(klientOprettetObjectClass);
+    public String getEventName(Class<?> clazz) {
+        return eventClassesToNames.get(clazz);
     }
 
     public Class<?> getEventClass(String eventNavn) {
@@ -118,25 +118,11 @@ public class CqrsMetaInfo {
                         if (annotation instanceof CommandHandler){
                             scanCommandHandler(method, metainfoHolder);
                         }
-                        if (annotation instanceof EventSourcingHandler){
-                            scanEventSourcingHandler(method, metainfoHolder);
-                        }
                     }
                 }));
             });
     }
 
-    protected void scanEventSourcingHandler (Method method, HandlerMetainfoHolder metainfoHolder){
-        Class<?> parameterType = method.getParameterTypes()[1];
-        ReflectionUtils.doWithLocalFields(parameterType, field -> {
-            AggregateIdentifier annotation = AnnotationUtils.findAnnotation(field, AggregateIdentifier.class);
-            if (annotation != null) {
-                ReflectionUtils.makeAccessible(field);
-                registerAggrateIdentifer(parameterType, field);
-            }
-        });
-
-    }
     protected void scanCommandHandler (Method method, HandlerMetainfoHolder metainfoHolder){
         Class<?> parameterType = method.getParameterTypes()[1];
         ReflectionUtils.doWithLocalFields(parameterType, field -> {
@@ -166,18 +152,26 @@ public class CqrsMetaInfo {
     private void scanForBusinessObjects(List<String> basePackages) throws Exception {
         ClassPathScanningCandidateComponentProvider scanner;
         scanner = new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessObject.class));
+        scanner.addIncludeFilter(new AnnotationTypeFilter(BusinessEvent.class));
         //Maybe use: Collection<Object> containers = context.getBeansWithAnnotation(Aggregate.class).values();
         basePackages.forEach(ExceptionConsumer.wrapper(basePackage -> {
             Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents(basePackage);
             for (BeanDefinition definition : candidateComponents) {
                 System.out.println(definition.getBeanClassName());
-                Class clazz = Class.forName(definition.getBeanClassName());
+                Class<?> clazz = Class.forName(definition.getBeanClassName());
+                ReflectionUtils.doWithLocalFields(clazz, field -> {
+                    AggregateIdentifier annotation = AnnotationUtils.findAnnotation(field, AggregateIdentifier.class);
+                    if (annotation != null) {
+                        ReflectionUtils.makeAccessible(field);
+                        registerAggrateIdentifer(clazz, field);
+                    }
+                });
                 //new TypeDescriptor.OfMethod(clazz.getMethod("test",clazz));
-                BusinessObject annotation = AnnotationUtils.findAnnotation(clazz, BusinessObject.class);
+                BusinessEvent annotation = AnnotationUtils.findAnnotation(clazz, BusinessEvent.class);
                 String eventName = (String) AnnotationUtils.getValue(annotation, "eventName");
                 eventNamesToClasses.put(eventName, clazz);
                 eventClassesToNames.put(clazz, eventName);
+
             }
         }));
     }

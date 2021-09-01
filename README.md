@@ -22,14 +22,14 @@ Poc er i kørende tilstand i stand til:
 1. At generere commands ud fra et request
 2. Lægge commands på en kommando-kø i applikationens interne køsystem (ikke kafka)
 3. Aftage disse commands i en write model, validere indholdet af commands, ajourfører sin write model og kaste en
-   tilhørende forretningshændelse (via DB -> Connector -> Kafka->Streaming Application -> Kafka)
+   tilhørende forretningshændelse (via DB -> Connector -> Kafka->Streaming dk.ksf.application.Application -> Kafka)
 4. Gribe BusinessEvents fra Kafka og overbringe dem til det applikationens interne køsystem.
 5. Ajourføre read model på baggrund af det modtagne Business-Event
 
 Derudover undstøtte PoC'en:
 
 1. Skabelsen af Snapshot
-2. Initialisering af write- og readmodel på baggrund af Business Events og snapshots
+2. Initialisering af write- og dk.ksf.application.readmodel på baggrund af Business Events og snapshots
 
 PoC'en mangler:
 
@@ -99,7 +99,7 @@ En event sourcing handler skabes tilsvarende:
         efternavn = event.getEfternavn();
         cpr = event.getCpr();
         version = context.getVersion();
-        log.info("Klient oprettet i writemodel");
+        log.info("Klient oprettet i dk.ksf.application.writemodel");
     }
 
 ```
@@ -133,8 +133,8 @@ For hvert type af aggregate (klient, retskreds)
   For hvert instans af aggregate (klient 050878-0517)
     Find første event og eftefølgende events hørende til eventstore eller snapshot
     For hver event:
-      Signaler "Event Sourcing Event"  (til "Event Sourcing Handlers" i aggregate / writemodel i applikationen)
-      Signaler "Event" (til "Event Handlers" i Perspectives / readmodel)
+      Signaler "Event Sourcing Event"  (til "Event Sourcing Handlers" i aggregate / dk.ksf.application.writemodel i applikationen)
+      Signaler "Event" (til "Event Handlers" i Perspectives / dk.ksf.application.readmodel)
        
 ```
 

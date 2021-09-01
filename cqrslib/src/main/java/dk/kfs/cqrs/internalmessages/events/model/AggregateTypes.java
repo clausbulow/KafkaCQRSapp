@@ -2,7 +2,8 @@ package dk.kfs.cqrs.internalmessages.events.model;
 
 public enum AggregateTypes {
     klient("klient"),
-    matrikel("matrikel");
+    matrikel("matrikel"),
+    celle("celle");
 
     private final String name;
 

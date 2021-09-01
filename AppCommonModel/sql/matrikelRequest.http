@@ -1,0 +1,15 @@
+POST http://localhost:8079/commands/matrikel
+Content-Type: application/json
+requestId: transI1
+
+{
+  "id": 5,
+  "vejnavn": "Borgergade 16",
+  "celler": [
+    {
+      "id": 5,
+      "nummer": 2,
+      "antalpladser": 2
+    }
+  ]
+}

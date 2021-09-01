@@ -13,6 +13,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -117,10 +118,18 @@ public abstract class AbstractExecutablesContainer {
         if (metaInfo.getEventName(event.getClass()) != null) {
             transactionTemplate.executeWithoutResult( t -> {
                 try {
+                    List<AbstractExecutor> eventSourcingExecutors = getEventSourcingExecutors();
+                    if (eventSourcingExecutors.size() > 0){
+                        signalEventSourcingHandlers(context, event);
+                    } else {
+                        save(context.getTargetInstance(), context.getKey());
+                    }
                     signalEventSourcingHandlers(context, event);
                     eventService.fireEvent(context.getTargetInstance(), context, event);
                 } catch (Exception e){
-                    t.setRollbackOnly();                }
+                    t.setRollbackOnly();
+                    throw new RuntimeException("Error when updating databases. ",e);
+                }
             });
         }
 
@@ -141,7 +150,8 @@ public abstract class AbstractExecutablesContainer {
 
     public void signalEventSourcingHandlers(MessageContext context, Object event) throws Exception {
         final List<AbstractExecutor> eventSourcingExecutors = getEventSourcingExecutors();
-        context.setKey((String) metaInfo.getAggregateIdentifierFromClass(event.getClass()).get(event));
+        Field targetAggregateIdentifier = metaInfo.getAggregateIdentifierFromClass(event.getClass());
+        context.setKey((String) targetAggregateIdentifier.get(event));
 
         eventSourcingExecutors.forEach(ExceptionConsumer.wrapper(executor -> {
             if (!executor.supports(event)) {
