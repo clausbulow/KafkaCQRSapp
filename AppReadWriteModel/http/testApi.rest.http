@@ -59,7 +59,7 @@ requestId: transI1
 
 {
   "cpr": "021165-1419",
-  "fornavn": "Jørgen",
+  "fornavn": "Jørgensen",
   "efternavn": "Dietrich"
 }
 
@@ -140,7 +140,7 @@ requestId: transI1
 {
   "cpr": "021165-1419",
   "fornavn": "Jørgen",
-  "efternavn": "Dietrichsen",
+  "efternavn": "Dietrich",
   "version": 13
 }
 
@@ -167,22 +167,22 @@ requestId: transId2
 }
 
 ### Hent klienter fra dk.ksf.application.readmodel
-GET http://localhost:8081/dk.kfs.application.dk.ksf.application.readmodel/klienter
+GET http://localhost:8081/readmodel/klienter
 Content-Type: application/json
 requestId: transId2
 
 
 ### Hent klienter fra dk.ksf.application.writemodel
-GET http://localhost:8081/dk.ksf.application.writemodel/klienter
+GET http://localhost:8081/writemodel/klienter
 Content-Type: application/json
 requestId: transId2
 
 ### Show the event-store
-GET http://localhost:8081/dk.ksf.application.writemodel/klienter/eventstore
+GET http://localhost:8081/writemodel/klienter/eventstore
 Content-Type: application/json
 requestId: transId2
 
 ### Create Snapshots
-POST http://localhost:8081/dk.ksf.application.writemodel/snapshots
+POST http://localhost:8081/writemodel/snapshots
 Content-Type: application/json
 requestId: transId2

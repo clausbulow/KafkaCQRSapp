@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/dk.ksf.application.writemodel")
+@RequestMapping("/writemodel")
 
 @Slf4j
 public class KlientWriteModelController {

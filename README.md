@@ -265,3 +265,9 @@ gældende version. Versionen tælles en op ved hver ændring af at aggregat og v
 Herved gøres det opnår vi en komplet tilstand for en instans af et aggregat, når vi indlæser sidst taget snapshot og
 alle efterfølgende events for den givne instans.
 
+## Moduler
+Repositoriet hér består af 3 moduler:
+1. "cqrslib" - som indeholder et fællesmodul for de 2 øvrige moduler. Dette bibliotek indholder kode, der understøtter den generelle
+eventhåndtering. F.eks. er det dette modul, der håndtere, at de korrekte handlers kaldes.
+2. "AppReadWriteModel" - der demonstrere en anvendelse af "cqrslib" til at lave en CQRSS løsning, hvor data opsamles i henholdvis en read og en writemodel
+3. "AppCommonModel" - der demonstrere en anvendelse af "cqrslib" til at lave en CQRS løsning, hvor queries og commands anvender en fælldes model til at foretage reads og writes af data.

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/dk.ksf.application.readmodel")
+@RequestMapping("/readmodel")
 
 @Slf4j
 public class KlientReadModelController {

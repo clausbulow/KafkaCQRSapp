@@ -23,7 +23,7 @@ public class KafkaEventHandler {
     @Autowired
     EventDispatcher dispatcher;
 
-    @KafkaListener(id = "#{'${spring.application.name}'}", topics = "#{'${kfs.cqrs.topicnames}'.split(',')}")
+    @KafkaListener(id= "eventslistener",clientIdPrefix = "#{'${spring.application.name}'}", topics = "#{'${kfs.cqrs.topicnames}'.split(',')}")
     public void listen(@Payload JsonNode jsonBusinessEvent, @Headers MessageHeaders messageHeaders, Acknowledgment ack) {
         try {
             ConvertToBusinessEventResponse eventWithContext = processor.converToBusinessEvent(jsonBusinessEvent);
